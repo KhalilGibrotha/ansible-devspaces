@@ -5,7 +5,7 @@ metadata:
 attributes:
   controller.devfile.io/storage-type: ephemeral
 projects:
-  - name: ansible-devspaces-demo
+  - name: ansible-devspaces
     source:
       type: git
       location: "${PROJECT_SOURCE:-https://github.com/KhalilGibrotha/ansible-devspaces}"
@@ -21,7 +21,7 @@ components:
       mountSources: true
       env:
         - name: ANSIBLE_CONFIG
-          value: /projects/ansible-devspaces-demo/ansible.cfg
+          value: /projects/ansible-devspaces/ansible.cfg
         - name: DOMAIN_USERNAME
           valueFrom:
             secretKeyRef:
@@ -47,7 +47,7 @@ commands:
     exec:
       label: Install Ansible Galaxy dependencies
       component: ansible-tools
-      workingDir: /projects/ansible-devspaces-demo
+      workingDir: /projects/ansible-devspaces
       commandLine: ansible-galaxy install -r requirements.yml --force
       group:
         kind: build
@@ -56,7 +56,7 @@ commands:
     exec:
       label: Synchronize upstream repositories
       component: ansible-tools
-      workingDir: /projects/ansible-devspaces-demo
+      workingDir: /projects/ansible-devspaces
       commandLine: ./scripts/clone-repos.sh
       group:
         kind: build
@@ -64,7 +64,7 @@ commands:
     exec:
       label: Run sample site playbook
       component: ansible-tools
-      workingDir: /projects/ansible-devspaces-demo
+      workingDir: /projects/ansible-devspaces
       commandLine: ansible-playbook playbooks/site.yml
       group:
         kind: run
@@ -73,7 +73,7 @@ commands:
     exec:
       label: Run Ansible lint checks
       component: ansible-tools
-      workingDir: /projects/ansible-devspaces-demo
+      workingDir: /projects/ansible-devspaces
       commandLine: make lint
       group:
         kind: test
@@ -81,7 +81,7 @@ commands:
     exec:
       label: Run test suite
       component: ansible-tools
-      workingDir: /projects/ansible-devspaces-demo
+      workingDir: /projects/ansible-devspaces
       commandLine: make test
       group:
         kind: test
