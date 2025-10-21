@@ -1,0 +1,22 @@
+- hosts: all
+  become: true
+  tasks:
+    - name: Ensure required packages are installed
+      apt:
+        name:
+          - git
+          - curl
+          - ansible
+        state: present
+
+    - name: Clone additional repositories
+      git:
+        repo: "{{ item }}"
+        dest: "/path/to/your/project/directory/{{ item | basename }}"
+      loop: 
+        - "https://github.com/example/repo1.git"
+        - "https://github.com/example/repo2.git"
+        - "https://github.com/example/repo3.git"
+
+    - name: Run a sample command
+      command: echo "Ansible playbook executed successfully!"

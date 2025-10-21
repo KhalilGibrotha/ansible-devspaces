@@ -1,4 +1,4 @@
-# URL [destination]
+# URL [destination relative to .workspace/]
 https://github.com/ansible/ansible-dev-tools/tree/main/devspaces ansible-dev-tools-devspaces
 https://github.com/ansible/ansible-dev-tools ansible-dev-tools
 https://github.com/redhat-developer-demos/ansible-devspaces-demo

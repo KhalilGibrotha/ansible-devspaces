@@ -1,0 +1,35 @@
+name: arc-ansible-devspace
+version: v1.0.0
+deployments:
+  - name: ansible-devspaces-demo
+    namespace: devspaces
+    resources:
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
+      requests:
+        cpu: "250m"
+        memory: "512Mi"
+    source:
+      type: git
+      url: https://github.com/redhat-developer-demos/ansible-devspaces-demo
+      branch: main
+    environment:
+      - name: ENV_VAR_NAME
+        value: ENV_VAR_VALUE
+    services:
+      - name: web
+        port: 8080
+        targetPort: 8080
+        type: ClusterIP
+    build:
+      strategy: Source
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - ARG_NAME=ARG_VALUE
+    hooks:
+      preDeploy:
+        - command: ./scripts/clone-repos.sh
+      postDeploy:
+        - command: echo "Deployment completed!"

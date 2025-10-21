@@ -1,0 +1,19 @@
+{
+    "name": "Ansible Devspaces Demo",
+    "image": "mcr.microsoft.com/vscode/devcontainers/python:3.9",
+    "features": {
+        "git": "latest",
+        "docker-in-docker": "latest"
+    },
+    "extensions": [
+        "ms-azuretools.vscode-docker",
+        "ms-python.python",
+        "redhat.ansible"
+    ],
+    "settings": {
+        "python.pythonPath": "/usr/local/bin/python",
+        "editor.formatOnSave": true
+    },
+    "postCreateCommand": "bash scripts/clone-repos.sh",
+    "remoteUser": "vscode"
+}

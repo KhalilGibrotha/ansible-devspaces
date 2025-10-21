@@ -1,0 +1,27 @@
+{
+  "folders": [
+    {
+      "name": "ansible-devspaces-demo",
+      "path": "."
+    },
+    {
+      "name": "playbooks",
+      "path": "playbooks"
+    },
+    {
+      "name": "roles",
+      "path": "roles"
+    },
+    {
+      "name": "inventories",
+      "path": "inventories"
+    },
+    {
+      "name": "scripts",
+      "path": "scripts"
+    }
+  ],
+  "settings": {
+    "git.ignoreLimitWarning": true
+  }
+}

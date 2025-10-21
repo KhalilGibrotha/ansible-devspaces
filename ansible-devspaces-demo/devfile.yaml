@@ -1,0 +1,21 @@
+components:
+  - name: ansible
+    image: ansible/ansible:latest
+    commands:
+      - name: Install dependencies
+        exec:
+          command: ansible-galaxy install -r requirements.yml
+      - name: Run playbook
+        exec:
+          command: ansible-playbook playbooks/site.yml
+    attributes:
+      version: "latest"
+      ports:
+        - port: 8080
+          protocol: http
+      env:
+        ANSIBLE_CONFIG: /workspace/ansible.cfg
+
+metadata:
+  name: arc-ansible-devspace
+  description: Development environment for Ansible playbooks and roles.

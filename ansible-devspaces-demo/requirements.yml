@@ -1,0 +1,12 @@
+- name: ansible-devspaces-demo
+  src: https://github.com/redhat-developer-demos/ansible-devspaces-demo
+  version: master
+  dependencies:
+    - name: geerlingguy.apache
+      src: https://github.com/geerlingguy/ansible-role-apache
+    - name: geerlingguy.mysql
+      src: https://github.com/geerlingguy/ansible-role-mysql
+    - name: geerlingguy.php
+      src: https://github.com/geerlingguy/ansible-role-php
+    - name: geerlingguy.phpmyadmin
+      src: https://github.com/geerlingguy/ansible-role-phpmyadmin

@@ -8,7 +8,7 @@ We started from the excellent [`redhat-developer-demos/ansible-devspaces-demo`](
 
 - **Upstream tooling** (`ansible-dev-tools`): Provides the execution environment, Molecule configuration, linting profiles, and VS Code extension recommendations. We selectively sparse-checkout the `devspaces` subtree while also cloning the full repository for Molecule test assets.
 - **Dev Spaces definition** (`devfile.yaml` and `devspace.yaml`): Declares the runtime image, commands, resource limits, and deployment hooks used by Red Hat OpenShift Dev Spaces.
-- **Workspace bootstrap** (`scripts/clone-repos.sh` + `repos-to-clone.txt`): Fetches upstream dependencies and adjacent projects during environment startup so every workspace opens with the same folder layout.
+- **Workspace bootstrap** (`scripts/clone-repos.sh` + `repos-to-clone.txt`): Fetches upstream dependencies and adjacent projects during environment startup so every workspace opens with the same folder layout. All clones land under `.workspace/`, which stays out of version control but is always rebuilt on launch.
 - **Automation content** (`playbooks/`, `roles/`, `inventories/`, `requirements.yml`): Houses the playbooks and roles teams iterate on inside the environment.
 - **Editor experience** (`workspace.code-workspace`, `.vscode/`, `.devcontainer/`): Aligns VS Code settings, extensions, and container defaults with what the upstream tools expect.
 
@@ -32,8 +32,8 @@ We started from the excellent [`redhat-developer-demos/ansible-devspaces-demo`](
 
 - `devfile.yaml`: Dev Spaces component/image definition.
 - `devspace.yaml`: Namespaced deployment configuration plus pre/post hooks.
-- `repos-to-clone.txt`: One URL per line, optional destination folder in column two. Maintained so new teams inherit identical checkouts.
-- `scripts/clone-repos.sh`: Idempotent clone script that understands sparse checkouts and skips folders that already exist.
+- `repos-to-clone.txt`: One URL per line, optional destination folder in column two. Maintained so new teams inherit identical checkouts beneath `.workspace/`.
+- `scripts/clone-repos.sh`: Idempotent clone script that understands sparse checkouts, clones into `.workspace/`, and skips folders that already exist.
 - `playbooks/`, `roles/`, `inventories/`: Primary Ansible content.
 - `requirements.yml`: Galaxy dependencies the workspace installs on boot.
 - `.devcontainer/`, `.vscode/`, `workspace.code-workspace`: Developer experience settings.

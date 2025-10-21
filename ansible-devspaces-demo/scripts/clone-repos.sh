@@ -6,11 +6,14 @@ SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 cd "$SCRIPT_DIR/.."
 
 REPO_LIST="repos-to-clone.txt"
+CLONE_ROOT=".workspace"
 
 if [[ ! -f $REPO_LIST ]]; then
     echo "Repository list $REPO_LIST not found." >&2
     exit 1
 fi
+
+mkdir -p "$CLONE_ROOT"
 
 trim() {
     local s="$1"
@@ -48,6 +51,7 @@ while IFS= read -r line || [[ -n $line ]]; do
         repo_name="${base_repo##*/}"
         repo_name="${repo_name%.git}"
         dest_dir="${dest:-${repo_name}-${subpath//\//-}}"
+        dest_dir="$CLONE_ROOT/$dest_dir"
 
         if [[ -d $dest_dir ]]; then
             echo "Skipping $dest_dir (already present)."
@@ -64,6 +68,7 @@ while IFS= read -r line || [[ -n $line ]]; do
         repo_name="${url##*/}"
         repo_name="${repo_name%.git}"
         dest_dir="${dest:-$repo_name}"
+        dest_dir="$CLONE_ROOT/$dest_dir"
 
         if [[ -d $dest_dir ]]; then
             echo "Skipping $dest_dir (already present)."
