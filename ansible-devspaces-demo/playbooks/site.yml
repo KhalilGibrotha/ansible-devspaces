@@ -1,22 +1,40 @@
-- hosts: all
-  become: true
+---
+- name: Bootstrap local devspace workspace
+  hosts: local
+  gather_facts: false
+  vars_files:
+    - ../group_vars/all/secrets.yml
   tasks:
-    - name: Ensure required packages are installed
-      apt:
+    - name: Ensure workspace scratch directory exists
+      ansible.builtin.file:
+        path: ../.workspace
+        state: directory
+        mode: '0750'
+
+    - name: Ensure required python packages are present
+      ansible.builtin.pip:
         name:
-          - git
-          - curl
-          - ansible
-        state: present
+          - ansible-lint
+          - molecule
+        extra_args: --user
+      environment:
+        PIP_CACHE_DIR: "{{ lookup('ansible.builtin.env', 'PIP_CACHE_DIR', default='/tmp/pip-cache') }}"
 
-    - name: Clone additional repositories
-      git:
-        repo: "{{ item }}"
-        dest: "/path/to/your/project/directory/{{ item | basename }}"
-      loop: 
-        - "https://github.com/example/repo1.git"
-        - "https://github.com/example/repo2.git"
-        - "https://github.com/example/repo3.git"
+    - name: Display injected domain credentials
+      ansible.builtin.debug:
+        msg: >-
+          Using DOMAIN_USERNAME='{{ domain_username | default('') }}'
+          (DOMAIN_PASSWORD is {{ 'set' if domain_password else 'not set' }}).
+      when: domain_username | default('') | length > 0
 
-    - name: Run a sample command
-      command: echo "Ansible playbook executed successfully!"
+    - name: Write workspace secrets file for downstream playbooks
+      ansible.builtin.copy:
+        dest: ../.workspace/domain_credentials.yml
+        content: |
+          domain_username: "{{ domain_username | default('') }}"
+          domain_password: "{{ domain_password | default('') }}"
+        mode: '0600'
+
+    - name: Confirm bootstrap complete
+      ansible.builtin.debug:
+        msg: "Workspace bootstrap playbook finished successfully."

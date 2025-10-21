@@ -1,21 +1,97 @@
-components:
-  - name: ansible
-    image: ansible/ansible:latest
-    commands:
-      - name: Install dependencies
-        exec:
-          command: ansible-galaxy install -r requirements.yml
-      - name: Run playbook
-        exec:
-          command: ansible-playbook playbooks/site.yml
-    attributes:
-      version: "latest"
-      ports:
-        - port: 8080
-          protocol: http
-      env:
-        ANSIBLE_CONFIG: /workspace/ansible.cfg
-
+schemaVersion: 2.2.0
 metadata:
   name: arc-ansible-devspace
   description: Development environment for Ansible playbooks and roles.
+attributes:
+  controller.devfile.io/storage-type: ephemeral
+projects:
+  - name: ansible-devspaces-demo
+    source:
+      type: git
+      location: "${PROJECT_SOURCE:-https://github.com/KhalilGibrotha/ansible-devspaces}"
+      branch: "${PROJECT_BRANCH:-develop}"
+components:
+  - name: ansible-tools
+    container:
+      image: quay.io/ansible/toolset:latest
+      memoryLimit: 2Gi
+      cpuLimit: 1500m
+      cpuRequest: 500m
+      memoryRequest: 1Gi
+      mountSources: true
+      env:
+        - name: ANSIBLE_CONFIG
+          value: /projects/ansible-devspaces-demo/ansible.cfg
+        - name: DOMAIN_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: domain-credentials
+              key: username
+        - name: DOMAIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: domain-credentials
+              key: password
+        - name: PIP_CACHE_DIR
+          value: /tmp/pip-cache
+        - name: PYTHONUNBUFFERED
+          value: "1"
+      volumeMounts:
+        - name: pip-cache
+          path: /tmp/pip-cache
+  - name: pip-cache
+    volume:
+      size: 1Gi
+commands:
+  - id: install-galaxy-deps
+    exec:
+      label: Install Ansible Galaxy dependencies
+      component: ansible-tools
+      workingDir: /projects/ansible-devspaces-demo
+      commandLine: ansible-galaxy install -r requirements.yml --force
+      group:
+        kind: build
+        isDefault: true
+  - id: sync-upstream-repos
+    exec:
+      label: Synchronize upstream repositories
+      component: ansible-tools
+      workingDir: /projects/ansible-devspaces-demo
+      commandLine: ./scripts/clone-repos.sh
+      group:
+        kind: build
+  - id: run-sample-playbook
+    exec:
+      label: Run sample site playbook
+      component: ansible-tools
+      workingDir: /projects/ansible-devspaces-demo
+      commandLine: ansible-playbook playbooks/site.yml
+      group:
+        kind: run
+        isDefault: true
+  - id: run-ansible-lint
+    exec:
+      label: Run Ansible lint checks
+      component: ansible-tools
+      workingDir: /projects/ansible-devspaces-demo
+      commandLine: make lint
+      group:
+        kind: test
+  - id: run-test-suite
+    exec:
+      label: Run test suite
+      component: ansible-tools
+      workingDir: /projects/ansible-devspaces-demo
+      commandLine: make test
+      group:
+        kind: test
+  - id: open-shell
+    exec:
+      label: Open interactive shell
+      component: ansible-tools
+      commandLine: /bin/bash
+      hotReloadCapable: true
+events:
+  postStart:
+    - sync-upstream-repos
+    - install-galaxy-deps
