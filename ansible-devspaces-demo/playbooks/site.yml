@@ -31,8 +31,8 @@
       ansible.builtin.copy:
         dest: ../.workspace/domain_credentials.yml
         content: |
-          domain_username: {{ domain_username | default('') }}
-          domain_password: {{ domain_password | default('') }}
+          domain_username: "{{ domain_username | default('') }}"
+          domain_password: "{{ domain_password | default('') }}"
         mode: '0600'
 
     - name: Confirm bootstrap complete
