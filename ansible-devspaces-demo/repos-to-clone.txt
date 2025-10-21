@@ -1,5 +1,7 @@
 # URL [destination relative to .workspace/]
+# Upstream Dev Spaces helpers
 https://github.com/ansible/ansible-dev-tools/tree/main/devspaces ansible-dev-tools-devspaces
 https://github.com/ansible/ansible-dev-tools ansible-dev-tools
-https://github.com/redhat-developer-demos/ansible-devspaces-demo
-https://github.com/KhalilGibrotha/ansible-devspaces
+# Example application repositories to exercise against
+https://github.com/ansible-collections/ansible.windows
+https://github.com/ansible-collections/community.windows

@@ -1,57 +1,82 @@
-# Ansible Devspaces Demo
+# Ansible Dev Spaces Demo
 
-This repository captures the Dev Spaces definition we ship to our Ansible engineering teams. It assembles upstream building blocks, bootstraps the container workspace, and brings in project-specific playbooks, inventories, and tooling.
+This repository provides a ready-to-run OpenShift Dev Spaces (Che) workspace for iterating on Ansible automation. It pulls in the upstream `ansible-dev-tools` workspace helpers, installs a curated set of Galaxy roles and collections, and exposes opinionated playbooks you can use as a smoke test for the environment.
 
-We started from the excellent [`redhat-developer-demos/ansible-devspaces-demo`](https://github.com/redhat-developer-demos/ansible-devspaces-demo) and layered in our own automation. Many thanks to the original authors for the foundation.
+The implementation borrows ideas from the original [`redhat-developer-demos/ansible-devspaces-demo`](https://github.com/redhat-developer-demos/ansible-devspaces-demo) while updating the layout to match the current DevWorkspace and Devfile 2.x specifications.
 
-## Layered Architecture
+## What's Included
 
-- **Upstream tooling** (`ansible-dev-tools`): Provides the execution environment, Molecule configuration, linting profiles, and VS Code extension recommendations. We selectively sparse-checkout the `devspaces` subtree while also cloning the full repository for Molecule test assets.
-- **Dev Spaces definition** (`devfile.yaml` and `devspace.yaml`): Declares the runtime image, commands, resource limits, and deployment hooks used by Red Hat OpenShift Dev Spaces.
-- **Workspace bootstrap** (`scripts/clone-repos.sh` + `repos-to-clone.txt`): Fetches upstream dependencies and adjacent projects during environment startup so every workspace opens with the same folder layout. All clones land under `.workspace/`, which stays out of version control but is always rebuilt on launch.
-- **Automation content** (`playbooks/`, `roles/`, `inventories/`, `requirements.yml`): Houses the playbooks and roles teams iterate on inside the environment.
-- **Editor experience** (`workspace.code-workspace`, `.vscode/`, `.devcontainer/`): Aligns VS Code settings, extensions, and container defaults with what the upstream tools expect.
+- **DevWorkspace definition** (`devspace.yaml`) and **Devfile 2.2** (`devfile.yaml`) describing the workspace container, commands, and startup hooks.
+- **Bootstrap automation** (`scripts/clone-repos.sh` + `repos-to-clone.txt`) that materialises upstream Ansible dependencies inside `.workspace/` on every launch.
+- **Project configuration** (`ansible.cfg`, `group_vars/`, `inventories/`) tuned for local execution against the Dev Spaces container.
+- **Sample playbook** (`playbooks/site.yml`) that demonstrates how to reference injected OpenShift secrets and produce a reusable credentials file for downstream automation.
+- **Galaxy dependencies** (`requirements.yml`) pinning widely used community roles and collections so linting, Molecule, and playbook runs behave consistently.
+- **Makefile helpers** (`Makefile`) wrapping the most common bootstrap and verification workflows (`make bootstrap`, `make lint`, `make test`, `make smoke`).
 
-## Upstream Requirements
+## Launching in Dev Spaces
 
-- Red Hat OpenShift Dev Spaces 3.x (or Che 7+) to consume the `devfile.yaml`
-- Internet access from the workspace container to clone GitHub repositories listed in `repos-to-clone.txt`
-- Cluster permissions to apply or update resources under the `devspaces` namespace when running `devspace.yaml`
-- `oc` CLI available within the workspace image if you plan to apply the Dev Space orchestration from a terminal
-- Git credentials configured in Dev Spaces so private forks of the upstream repositories can be fetched when required
+1. **Create required secrets** – provision an OpenShift secret named `domain-credentials` in the same namespace as your DevWorkspace. It must contain `username` and `password` keys so the workspace can export `DOMAIN_USERNAME` and `DOMAIN_PASSWORD` environment variables.
+2. **Start the workspace** – point Dev Spaces at this repository. The DevWorkspace controller consumes `devspace.yaml`, spins up the `quay.io/ansible/toolset:latest` image, and applies the secret-backed environment variables automatically.
+3. **Automatic bootstrap** – the `postStart` events in both the DevWorkspace and Devfile run `./scripts/clone-repos.sh` and `ansible-galaxy install -r requirements.yml` so upstream content and dependencies are ready immediately.
+4. **Run the smoke test** – execute the `Run sample site playbook` command (or run `ansible-playbook playbooks/site.yml` manually). The playbook installs developer tooling, surfaces the injected domain credentials, and writes `.workspace/domain_credentials.yml` for reuse.
+5. **Iterate with fast feedback** – leverage the built-in commands (e.g. `Run Ansible lint checks`, `Run test suite`) or call the Makefile targets directly (`make lint`, `make test`, `make smoke`) to validate changes as you work.
 
-## Dev Space Provisioning Flow
-
-1. **Workspace launch**: Dev Spaces reads `devfile.yaml`, pulls the specified container image, and seeds environment variables.
-2. **Pre-deploy hook**: `./scripts/clone-repos.sh` runs automatically (see `devspace.yaml`), cloning every entry in `repos-to-clone.txt`. URLs ending in `/tree/<branch>/<path>` trigger a sparse checkout of just that subtree while still fetching the full repo when requested.
-3. **Dependency install**: The `Install dependencies` command installs Ansible collections and roles from `requirements.yml` inside the workspace container.
-4. **Development workflow**: Engineers open VS Code (either the web IDE or a connected desktop) using `workspace.code-workspace`, gaining linting, Molecule, and extension defaults from `ansible-dev-tools`.
-5. **Execution**: Use the provided commands (e.g., `Run playbook`) or your own `ansible-playbook` / `molecule` invocations.
-
-## Repository Map
-
-- `devfile.yaml`: Dev Spaces component/image definition.
-- `devspace.yaml`: Namespaced deployment configuration plus pre/post hooks.
-- `repos-to-clone.txt`: One URL per line, optional destination folder in column two. Maintained so new teams inherit identical checkouts beneath `.workspace/`.
-- `scripts/clone-repos.sh`: Idempotent clone script that understands sparse checkouts, clones into `.workspace/`, and skips folders that already exist.
-- `playbooks/`, `roles/`, `inventories/`: Primary Ansible content.
-- `requirements.yml`: Galaxy dependencies the workspace installs on boot.
-- `.devcontainer/`, `.vscode/`, `workspace.code-workspace`: Developer experience settings.
-
-## Local Testing Outside Dev Spaces
-
-You can exercise the same workflow locally:
+If you prefer to launch the workspace locally, run the same bootstrap steps from a terminal:
 
 ```bash
 git clone https://github.com/KhalilGibrotha/ansible-devspaces
-cd ansible-devspaces/ansible-devspaces-demo
-./scripts/clone-repos.sh
-ansible-galaxy install -r requirements.yml
-code workspace.code-workspace
+cd ansible-devspaces
+git checkout feature/devspaces-testing
+cd ansible-devspaces-demo
+make bootstrap
+make lint
+make test
+make smoke
+ansible-playbook playbooks/site.yml
 ```
 
-Run Molecule scenarios or playbooks exactly as they would execute inside Dev Spaces to ensure changes behave consistently.
+## Working with Secrets Inside Playbooks
 
-## Contributing
+Secrets passed through OpenShift (or Che) appear as environment variables on the workspace container. The repository ships with `group_vars/all/secrets.yml` that resolves the `DOMAIN_USERNAME` and `DOMAIN_PASSWORD` variables and makes them available to every playbook. You can reference them directly:
 
-Please submit issues or pull requests if upstream requirements change or new layers must be integrated. Remember to credit `redhat-developer-demos/ansible-devspaces-demo` when sharing derivative work, just as we do here.
+```yaml
+- name: Use injected credentials
+  ansible.builtin.uri:
+    url: https://internal.example.com/auth
+    method: POST
+    body_format: json
+    body:
+      username: "{{ domain_username }}"
+      password: "{{ domain_password }}"
+```
+
+By default the sample playbook copies those values to `.workspace/domain_credentials.yml`. Update or remove that task if you want to manage secrets differently.
+
+## Repository Structure
+
+```
+ansible-devspaces-demo/
+├── Makefile
+├── ansible.cfg
+├── devfile.yaml
+├── devspace.yaml
+├── group_vars/
+│   └── all/
+│       └── secrets.yml
+├── inventories/
+│   └── hosts.ini
+├── playbooks/
+│   └── site.yml
+├── requirements.yml
+├── repos-to-clone.txt
+└── scripts/
+    └── clone-repos.sh
+```
+
+## Next Steps
+
+- Add Molecule scenarios and CI workflows tailored to the roles you build in this workspace.
+- Extend `repos-to-clone.txt` with the application repositories you plan to test against.
+- Replace the sample playbook with your project-specific automation once the workspace bootstrap flow meets your needs.
+
+Contributions and feedback are welcome!
