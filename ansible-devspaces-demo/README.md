@@ -29,10 +29,8 @@ cd ansible-devspaces
 git checkout main
 cd ansible-devspaces-demo
 make bootstrap
-make lint
 make test
 make smoke
-ansible-playbook playbooks/site.yml
 ```
 
 ## Working with Secrets Inside Playbooks
