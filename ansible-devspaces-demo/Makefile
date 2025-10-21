@@ -14,8 +14,8 @@ syntax-check:
 	$(ANSIBLE_PLAYBOOK) --syntax-check -i inventories/hosts.ini playbooks/site.yml
 
 # Aggregate target suitable for CI or local verification
-# Ensures linting and syntax validation succeed before running the sample playbook
-# Execution of the playbook itself is optional and can be invoked separately.
+# Ensures linting and syntax validation succeed; does not execute the playbook itself.
+# To run the playbook, use the separate 'smoke' target.
 test: lint syntax-check
 
 smoke:
