@@ -10,7 +10,7 @@ spec:
   routingClass: che
   template:
     projects:
-      - name: ansible-devspaces-demo
+      - name: ansible-devspaces
         git:
           remotes:
             origin: https://github.com/KhalilGibrotha/ansible-devspaces
@@ -22,45 +22,45 @@ spec:
           image: quay.io/ansible/toolset:latest
           mountSources: true
           memoryLimit: 2Gi
-          env:
-            - name: ANSIBLE_CONFIG
-              value: /projects/ansible-devspaces-demo/ansible.cfg
-            - name: DOMAIN_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: domain-credentials
-                  key: username
-            - name: DOMAIN_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: domain-credentials
-                  key: password
+        env:
+          - name: ANSIBLE_CONFIG
+            value: /projects/ansible-devspaces/ansible.cfg
+          - name: DOMAIN_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: domain-credentials
+                key: username
+          - name: DOMAIN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: domain-credentials
+                key: password
     commands:
       - id: install-galaxy-deps
         exec:
           component: ansible-tools
           commandLine: ansible-galaxy install -r requirements.yml --force
-          workingDir: /projects/ansible-devspaces-demo
+        workingDir: /projects/ansible-devspaces
       - id: sync-upstream-repos
         exec:
           component: ansible-tools
           commandLine: ./scripts/clone-repos.sh
-          workingDir: /projects/ansible-devspaces-demo
+        workingDir: /projects/ansible-devspaces
       - id: run-sample-playbook
         exec:
           component: ansible-tools
           commandLine: ansible-playbook playbooks/site.yml
-          workingDir: /projects/ansible-devspaces-demo
+        workingDir: /projects/ansible-devspaces
       - id: run-ansible-lint
         exec:
           component: ansible-tools
           commandLine: make lint
-          workingDir: /projects/ansible-devspaces-demo
+        workingDir: /projects/ansible-devspaces
       - id: run-test-suite
         exec:
           component: ansible-tools
           commandLine: make test
-          workingDir: /projects/ansible-devspaces-demo
+        workingDir: /projects/ansible-devspaces
     events:
       postStart:
         - sync-upstream-repos
