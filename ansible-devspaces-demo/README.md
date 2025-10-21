@@ -26,7 +26,7 @@ If you prefer to launch the workspace locally, run the same bootstrap steps from
 ```bash
 git clone https://github.com/KhalilGibrotha/ansible-devspaces
 cd ansible-devspaces
-git checkout feature/devspaces-testing
+git checkout main
 cd ansible-devspaces-demo
 make bootstrap
 make lint
