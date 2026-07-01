@@ -158,10 +158,10 @@ make docx-renderer-test
 cp scripts/docx-renderer.env.example .docx-renderer.env
 # update .docx-renderer.env for your namespace, PVC, and document paths
 set -a && . ./.docx-renderer.env && set +a
-./scripts/docx-renderer.sh apply-kroki
-./scripts/docx-renderer.sh run-job
-./scripts/docx-renderer.sh wait-job
-./scripts/docx-renderer.sh logs-job
+bash ./scripts/docx-renderer.sh apply-kroki
+bash ./scripts/docx-renderer.sh run-job
+bash ./scripts/docx-renderer.sh wait-job
+bash ./scripts/docx-renderer.sh logs-job
 ```
 
 There is a ready-made test document at

@@ -2,7 +2,7 @@
 
 ANSIBLE_PLAYBOOK ?= ansible-playbook
 ANSIBLE_LINT ?= ansible-lint
-PYTHON ?= python
+PYTHON ?= python3
 
 bootstrap:
 	bash ./scripts/clone-repos.sh
@@ -26,10 +26,10 @@ docx-renderer-test:
 	$(PYTHON) -m unittest discover -s tests -p "test_docx_renderer.py"
 
 print-kroki-manifest:
-	./scripts/docx-renderer.sh print-kroki
+	bash ./scripts/docx-renderer.sh print-kroki
 
 print-docx-job:
-	./scripts/docx-renderer.sh print-job
+	bash ./scripts/docx-renderer.sh print-job
 
 clean-workspace:
 	rm -rf .workspace

@@ -14,13 +14,13 @@ The flow is:
 Use the helper script from the repository root:
 
 ```bash
-./scripts/docx-renderer.sh apply-kroki
+bash ./scripts/docx-renderer.sh apply-kroki
 WORKSPACE_PVC=my-workspace-pvc \
 INPUT_MARKDOWN=/workspace/content/docs/sample.md \
 OUTPUT_DOCX=/workspace/content/exports/sample.docx \
-./scripts/docx-renderer.sh run-job
-./scripts/docx-renderer.sh wait-job
-./scripts/docx-renderer.sh logs-job
+bash ./scripts/docx-renderer.sh run-job
+bash ./scripts/docx-renderer.sh wait-job
+bash ./scripts/docx-renderer.sh logs-job
 ```
 
 The job manifest assumes the workspace PVC already contains both
