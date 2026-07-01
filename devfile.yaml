@@ -51,6 +51,15 @@ commands:
       commandLine: bash ./scripts/clone-repos.sh
       group:
         kind: build
+  - id: bootstrap-workspace
+    exec:
+      label: Bootstrap workspace dependencies
+      component: ansible-tools
+      workingDir: /projects/ansible-devspaces
+      commandLine: bash ./scripts/devspace-bootstrap.sh
+      group:
+        kind: build
+        isDefault: true
   - id: run-sample-playbook
     exec:
       label: Run sample site playbook

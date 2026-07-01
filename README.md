@@ -19,6 +19,8 @@ specifications.
 - **Bootstrap automation** (`scripts/clone-repos.sh` + `repos-to-clone.txt`)
   that materializes upstream Ansible dependencies inside `.workspace/` on every
   launch.
+- **Bootstrap wrapper** (`scripts/devspace-bootstrap.sh`) that runs clone and
+  Galaxy dependency install as one explicit post-start action.
 - **Project configuration** (`ansible.cfg`, `group_vars/`, `inventories/`)
   tuned for local execution against the Dev Spaces container.
 - **Sample playbook** (`playbooks/site.yml`) that demonstrates how to reference
@@ -46,10 +48,10 @@ specifications.
    `ghcr.io/ansible/ansible-devspaces` workspace image used by the upstream
    Red Hat demo, and applies the secret-backed environment variables
    automatically.
-3. **Manual bootstrap after workspace start**: once the IDE opens, run
-   `bash ./scripts/clone-repos.sh` and
-   `ansible-galaxy install -r requirements.yml --force` from the terminal to
-   fetch upstream content and dependencies.
+3. **Manual bootstrap after workspace start**: once the IDE opens, run the
+   `Bootstrap workspace dependencies` command from the Dev Spaces UI, or run
+   `bash ./scripts/devspace-bootstrap.sh` from the terminal to fetch upstream
+   content and dependencies.
 4. **Run the smoke test**: execute the `Run sample site playbook` command or
    run `ansible-playbook playbooks/site.yml` manually. The playbook installs
    developer tooling, surfaces the injected domain credentials, and writes
@@ -61,8 +63,7 @@ specifications.
 After the workspace opens, run bootstrap manually:
 
 ```bash
-bash ./scripts/clone-repos.sh
-ansible-galaxy install -r requirements.yml --force
+bash ./scripts/devspace-bootstrap.sh
 ```
 
 If you prefer to launch the workspace locally, run the same bootstrap steps
@@ -124,6 +125,7 @@ requirements.yml
 repos-to-clone.txt
 scripts/
   clone-repos.sh
+  devspace-bootstrap.sh
   docx-renderer.env.example
   docx-renderer.sh
 tests/

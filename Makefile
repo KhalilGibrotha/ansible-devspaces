@@ -5,8 +5,7 @@ ANSIBLE_LINT ?= ansible-lint
 PYTHON ?= python3
 
 bootstrap:
-	bash ./scripts/clone-repos.sh
-	ansible-galaxy install -r requirements.yml --force
+	bash ./scripts/devspace-bootstrap.sh
 
 lint:
 	$(ANSIBLE_LINT) playbooks/

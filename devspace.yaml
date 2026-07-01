@@ -46,6 +46,11 @@ spec:
           component: ansible-tools
           commandLine: bash ./scripts/clone-repos.sh
         workingDir: /projects/ansible-devspaces
+      - id: bootstrap-workspace
+        exec:
+          component: ansible-tools
+          commandLine: bash ./scripts/devspace-bootstrap.sh
+        workingDir: /projects/ansible-devspaces
       - id: run-sample-playbook
         exec:
           component: ansible-tools
