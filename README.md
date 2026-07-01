@@ -43,8 +43,9 @@ specifications.
    `DOMAIN_USERNAME` and `DOMAIN_PASSWORD` environment variables.
 2. **Start the workspace**: point Dev Spaces at this repository. The
    DevWorkspace controller consumes `devspace.yaml`, spins up the
-   `quay.io/ansible/toolset:latest` image, and applies the secret-backed
-   environment variables automatically.
+   `ghcr.io/ansible/ansible-devspaces` workspace image used by the upstream
+   Red Hat demo, and applies the secret-backed environment variables
+   automatically.
 3. **Automatic bootstrap**: the `postStart` events in both the DevWorkspace and
    Devfile run `./scripts/clone-repos.sh` and
    `ansible-galaxy install -r requirements.yml` so upstream content and

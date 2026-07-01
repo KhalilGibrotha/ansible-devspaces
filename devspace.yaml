@@ -19,7 +19,7 @@ spec:
     components:
       - name: ansible-tools
         container:
-          image: quay.io/ansible/toolset:latest
+          image: ghcr.io/ansible/ansible-devspaces@sha256:d214eed0285eb589cb1dd2cf7fe5645d73bb9862bcf3b51c0c2101f9558b1de6
           mountSources: true
           memoryLimit: 2Gi
         env:
