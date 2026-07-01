@@ -1,4 +1,4 @@
-.PHONY: bootstrap lint syntax-check test smoke docx-renderer-test kroki-sidecar-test print-kroki-manifest print-docx-job clean-workspace
+.PHONY: bootstrap lint syntax-check test smoke docx-renderer-test kroki-sidecar-test docx-render-local docx-render-local-sample print-kroki-manifest print-docx-job clean-workspace
 
 ANSIBLE_PLAYBOOK ?= ansible-playbook
 ANSIBLE_LINT ?= ansible-lint
@@ -26,6 +26,14 @@ docx-renderer-test:
 
 kroki-sidecar-test:
 	$(PYTHON) ./scripts/verify-kroki.py
+
+docx-render-local:
+	bash ./scripts/docx-render-local.sh
+
+docx-render-local-sample:
+	cp scripts/docx-render-local.env.example .docx-render-local.env
+	@echo "# update .docx-render-local.env if needed, then run:"
+	@echo "set -a && . ./.docx-render-local.env && set +a && make docx-render-local"
 
 print-kroki-manifest:
 	bash ./scripts/docx-renderer.sh print-kroki

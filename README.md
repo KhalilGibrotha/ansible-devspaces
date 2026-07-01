@@ -38,6 +38,9 @@ specifications.
   isolated pods.
 - **Kroki sidecar smoke test** (`scripts/verify-kroki.py`) for validating that
   a local Kroki sidecar is reachable from the main Dev Spaces container.
+- **Local DOCX render wrapper** (`scripts/docx-render-local.sh`) for generating
+  DOCX output inside the workspace using the Kroki sidecar and a local Python
+  virtual environment.
 
 ## Launching in Dev Spaces
 
@@ -64,6 +67,9 @@ specifications.
 6. **Verify Kroki sidecar**: run the `Verify Kroki sidecar` command from the
    Dev Spaces UI or `make kroki-sidecar-test` from the terminal to confirm the
    sidecar responds to `/health` and can render a sample Mermaid diagram.
+7. **Render sample DOCX locally**: run the `Render sample DOCX locally` command
+   from the Dev Spaces UI or `make docx-render-local` from the terminal once
+   bootstrap has cloned `dac-toolkit` into `.workspace/`.
 
 After the workspace opens, run bootstrap manually:
 
@@ -131,6 +137,8 @@ repos-to-clone.txt
 scripts/
   clone-repos.sh
   devspace-bootstrap.sh
+  docx-render-local.env.example
+  docx-render-local.sh
   docx-renderer.env.example
   docx-renderer.sh
 tests/
@@ -153,6 +161,28 @@ make kroki-sidecar-test
 
 Or run the `Verify Kroki sidecar` command in the Dev Spaces UI. Successful
 output confirms both the health endpoint and a sample Mermaid SVG render work.
+
+## Local Mermaid-to-DOCX Flow
+
+The primary Mermaid render path is now workspace-local rather than Kubernetes
+Job-based. After running bootstrap, the local wrapper will:
+
+1. create or reuse a Python virtual environment
+2. install `docx-builder` from `.workspace/dac-toolkit/docx_builder`
+3. rewrite Mermaid fences to PNG assets through the Kroki sidecar
+4. run `docx-build` to generate the DOCX
+
+Quick start:
+
+```bash
+cp scripts/docx-render-local.env.example .docx-render-local.env
+set -a && . ./.docx-render-local.env && set +a
+make docx-render-local
+```
+
+The default sample input is `examples/docx/sample-mermaid-architecture.md` and
+the default output path is
+`examples/docx/output/sample-mermaid-architecture.docx`.
 
 ## Experimental Mermaid-to-DOCX Rendering
 

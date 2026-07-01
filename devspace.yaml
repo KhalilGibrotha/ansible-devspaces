@@ -78,6 +78,11 @@ spec:
           component: ansible-tools
           commandLine: python3 ./scripts/verify-kroki.py
         workingDir: /projects/ansible-devspaces
+      - id: render-sample-docx-local
+        exec:
+          component: ansible-tools
+          commandLine: bash ./scripts/docx-render-local.sh
+        workingDir: /projects/ansible-devspaces
       - id: run-sample-playbook
         exec:
           component: ansible-tools

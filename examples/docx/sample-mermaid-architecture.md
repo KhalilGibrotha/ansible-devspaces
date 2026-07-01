@@ -36,20 +36,20 @@ flowchart TD
 
 - The renderer should replace the Mermaid fence with a PNG image reference.
 - The DOCX output should keep heading numbering and body styling.
-- This branch uses isolated Kubernetes jobs instead of modifying the base Dev Space image.
+- This branch uses a local Kroki sidecar in the Dev Space pod.
 
 ## Decision Summary
 
 | Area | Decision | Reason |
 |---|---|---|
-| Diagram rendering | Kroki pod | Keep Mermaid conversion isolated |
+| Diagram rendering | Kroki sidecar | Keep Mermaid conversion local to the Dev Space |
 | DOCX conversion | `docx-build` from `dac-toolkit` | Reuse existing renderer |
-| Runtime model | Kubernetes Job | Disposable execution and clean logs |
+| Runtime model | Workspace-local script | Standard developer permissions |
 
 ## Security Considerations
 
-> The render job should operate only against the mounted workspace PVC and use
-> namespace-local services where possible.
+> The render flow should stay inside the workspace and use only the Dev Space
+> sidecar services that are available to standard developers.
 
 ## Next Step
 

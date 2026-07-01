@@ -96,6 +96,14 @@ commands:
       commandLine: python3 ./scripts/verify-kroki.py
       group:
         kind: test
+  - id: render-sample-docx-local
+    exec:
+      label: Render sample DOCX locally
+      component: ansible-tools
+      workingDir: /projects/ansible-devspaces
+      commandLine: bash ./scripts/docx-render-local.sh
+      group:
+        kind: run
   - id: run-sample-playbook
     exec:
       label: Run sample site playbook
