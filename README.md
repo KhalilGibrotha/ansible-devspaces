@@ -36,6 +36,8 @@ specifications.
   (`experiments/docx_renderer/`, `scripts/docx-renderer.sh`,
   `k8s/docx-renderer/`) for Mermaid-aware Markdown-to-DOCX rendering in
   isolated pods.
+- **Kroki sidecar smoke test** (`scripts/verify-kroki.py`) for validating that
+  a local Kroki sidecar is reachable from the main Dev Spaces container.
 
 ## Launching in Dev Spaces
 
@@ -59,6 +61,9 @@ specifications.
 5. **Iterate with fast feedback**: leverage the built-in commands or call the
    Makefile targets directly (`make lint`, `make test`, `make smoke`) to
    validate changes as you work.
+6. **Verify Kroki sidecar**: run the `Verify Kroki sidecar` command from the
+   Dev Spaces UI or `make kroki-sidecar-test` from the terminal to confirm the
+   sidecar responds to `/health` and can render a sample Mermaid diagram.
 
 After the workspace opens, run bootstrap manually:
 
@@ -131,6 +136,21 @@ scripts/
 tests/
   test_docx_renderer.py
 ```
+
+## Kroki Sidecar
+
+The Devfile now includes a `kroki-sidecar` container in the same workspace pod.
+It exposes Kroki on `http://127.0.0.1:8000` from the main `ansible-tools`
+container perspective.
+
+To verify the sidecar after the workspace starts:
+
+```bash
+make kroki-sidecar-test
+```
+
+Or run the `Verify Kroki sidecar` command in the Dev Spaces UI. Successful
+output confirms both the health endpoint and a sample Mermaid SVG render work.
 
 ## Experimental Mermaid-to-DOCX Rendering
 

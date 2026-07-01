@@ -35,6 +35,19 @@ spec:
               secretKeyRef:
                 name: domain-credentials
                 key: password
+      - name: kroki-sidecar
+        container:
+          image: yuzutech/kroki:0.28.0
+          memoryLimit: 1Gi
+          env:
+            - name: KROKI_HOST
+              value: "0.0.0.0"
+            - name: KROKI_PORT
+              value: "8000"
+        endpoints:
+          - name: kroki-http
+            targetPort: 8000
+            exposure: internal
     commands:
       - id: install-galaxy-deps
         exec:
@@ -50,6 +63,11 @@ spec:
         exec:
           component: ansible-tools
           commandLine: bash ./scripts/devspace-bootstrap.sh
+        workingDir: /projects/ansible-devspaces
+      - id: verify-kroki-sidecar
+        exec:
+          component: ansible-tools
+          commandLine: python3 ./scripts/verify-kroki.py
         workingDir: /projects/ansible-devspaces
       - id: run-sample-playbook
         exec:

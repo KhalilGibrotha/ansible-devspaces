@@ -30,6 +30,22 @@ components:
       volumeMounts:
         - name: pip-cache
           path: /tmp/pip-cache
+  - name: kroki-sidecar
+    container:
+      image: yuzutech/kroki:0.28.0
+      memoryLimit: 1Gi
+      memoryRequest: 256Mi
+      cpuRequest: 100m
+      cpuLimit: 500m
+      env:
+        - name: KROKI_HOST
+          value: "0.0.0.0"
+        - name: KROKI_PORT
+          value: "8000"
+      endpoints:
+        - name: kroki-http
+          targetPort: 8000
+          exposure: internal
   - name: pip-cache
     volume:
       size: 1Gi
@@ -60,6 +76,14 @@ commands:
       group:
         kind: build
         isDefault: true
+  - id: verify-kroki-sidecar
+    exec:
+      label: Verify Kroki sidecar
+      component: ansible-tools
+      workingDir: /projects/ansible-devspaces
+      commandLine: python3 ./scripts/verify-kroki.py
+      group:
+        kind: test
   - id: run-sample-playbook
     exec:
       label: Run sample site playbook
