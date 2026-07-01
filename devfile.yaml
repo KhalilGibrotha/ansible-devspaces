@@ -48,7 +48,7 @@ commands:
       label: Synchronize upstream repositories
       component: ansible-tools
       workingDir: /projects/ansible-devspaces
-      commandLine: ./scripts/clone-repos.sh
+      commandLine: bash ./scripts/clone-repos.sh
       group:
         kind: build
   - id: run-sample-playbook
@@ -87,7 +87,7 @@ commands:
       label: Best-effort post-start bootstrap
       component: ansible-tools
       workingDir: /projects/ansible-devspaces
-      commandLine: ./scripts/devspace-post-start.sh
+      commandLine: bash ./scripts/devspace-post-start.sh
 events:
   postStart:
     - post-start-bootstrap

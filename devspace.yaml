@@ -44,7 +44,7 @@ spec:
       - id: sync-upstream-repos
         exec:
           component: ansible-tools
-          commandLine: ./scripts/clone-repos.sh
+          commandLine: bash ./scripts/clone-repos.sh
         workingDir: /projects/ansible-devspaces
       - id: run-sample-playbook
         exec:
@@ -64,7 +64,7 @@ spec:
       - id: post-start-bootstrap
         exec:
           component: ansible-tools
-          commandLine: ./scripts/devspace-post-start.sh
+          commandLine: bash ./scripts/devspace-post-start.sh
         workingDir: /projects/ansible-devspaces
     events:
       postStart:
