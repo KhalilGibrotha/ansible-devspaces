@@ -8,9 +8,9 @@ projects:
   - name: ansible-devspaces
     git:
       remotes:
-        origin: "${PROJECT_SOURCE:-https://github.com/KhalilGibrotha/ansible-devspaces}"
+        origin: "https://github.com/KhalilGibrotha/ansible-devspaces"
       checkoutFrom:
-        revision: "${PROJECT_BRANCH:-develop}"
+        revision: "experiment/kroki-docx-mermaid-rendering"
 components:
   - name: ansible-tools
     container:
