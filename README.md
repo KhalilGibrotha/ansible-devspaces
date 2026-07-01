@@ -47,9 +47,10 @@ specifications.
    Red Hat demo, and applies the secret-backed environment variables
    automatically.
 3. **Automatic bootstrap**: the `postStart` events in both the DevWorkspace and
-   Devfile run `./scripts/clone-repos.sh` and
-   `ansible-galaxy install -r requirements.yml` so upstream content and
-   dependencies are ready immediately.
+   Devfile run `./scripts/devspace-post-start.sh`, which attempts
+   `./scripts/clone-repos.sh` and `ansible-galaxy install -r requirements.yml`
+   on a best-effort basis so the IDE can still open if an external dependency
+   is temporarily unavailable.
 4. **Run the smoke test**: execute the `Run sample site playbook` command or
    run `ansible-playbook playbooks/site.yml` manually. The playbook installs
    developer tooling, surfaces the injected domain credentials, and writes
@@ -57,6 +58,14 @@ specifications.
 5. **Iterate with fast feedback**: leverage the built-in commands or call the
    Makefile targets directly (`make lint`, `make test`, `make smoke`) to
    validate changes as you work.
+
+If bootstrap steps fail during workspace startup, open a terminal after the IDE
+loads and rerun them manually:
+
+```bash
+./scripts/clone-repos.sh
+ansible-galaxy install -r requirements.yml --force
+```
 
 If you prefer to launch the workspace locally, run the same bootstrap steps
 from a terminal:
