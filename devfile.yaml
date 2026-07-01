@@ -38,14 +38,26 @@ components:
       cpuRequest: 100m
       cpuLimit: 500m
       env:
-        - name: KROKI_HOST
-          value: "0.0.0.0"
-        - name: KROKI_PORT
-          value: "8000"
+        - name: KROKI_LISTEN
+          value: "0.0.0.0:8000"
+        - name: KROKI_MERMAID_HOST
+          value: "127.0.0.1"
+        - name: KROKI_MERMAID_PORT
+          value: "8002"
       endpoints:
         - name: kroki-http
           targetPort: 8000
           exposure: internal
+  - name: kroki-mermaid-sidecar
+    container:
+      image: yuzutech/kroki-mermaid:0.28.0
+      memoryLimit: 1Gi
+      memoryRequest: 256Mi
+      cpuRequest: 100m
+      cpuLimit: 500m
+      env:
+        - name: KROKI_MERMAID_LISTEN
+          value: "0.0.0.0:8002"
   - name: pip-cache
     volume:
       size: 1Gi

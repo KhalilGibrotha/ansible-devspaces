@@ -139,9 +139,11 @@ tests/
 
 ## Kroki Sidecar
 
-The Devfile now includes a `kroki-sidecar` container in the same workspace pod.
-It exposes Kroki on `http://127.0.0.1:8000` from the main `ansible-tools`
-container perspective.
+The Devfile now includes a `kroki-sidecar` gateway container plus a
+`kroki-mermaid-sidecar` companion container in the same workspace pod. This
+matches the official Kroki model where Mermaid is delegated to a separate
+companion service. From the main `ansible-tools` container perspective, Kroki
+is exposed on `http://127.0.0.1:8000`.
 
 To verify the sidecar after the workspace starts:
 
