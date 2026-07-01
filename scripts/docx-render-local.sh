@@ -6,8 +6,8 @@ SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 REPO_ROOT=$(cd "$SCRIPT_DIR/.." && pwd)
 
 TOOLKIT_DIR="${TOOLKIT_DIR:-$REPO_ROOT/workspace-repos/dac-toolkit}"
-INPUT_MARKDOWN="${INPUT_MARKDOWN:-$REPO_ROOT/examples/docx/sample-mermaid-architecture.md}"
-OUTPUT_DOCX="${OUTPUT_DOCX:-$REPO_ROOT/examples/docx/output/sample-mermaid-architecture.docx}"
+INPUT_MARKDOWN="${INPUT_MARKDOWN:-$REPO_ROOT/examples/docx/sample-diagram-gallery.md}"
+OUTPUT_DOCX="${OUTPUT_DOCX:-$REPO_ROOT/examples/docx/output/sample-diagram-gallery.docx}"
 ASSETS_DIR="${ASSETS_DIR:-$REPO_ROOT/examples/docx/output/generated-diagrams}"
 REWRITTEN_MARKDOWN="${REWRITTEN_MARKDOWN:-/tmp/rendered-with-kroki.md}"
 ORG_YAML="${ORG_YAML:-$REPO_ROOT/examples/docx/org.yaml}"
@@ -22,7 +22,17 @@ fi
 
 if [[ ! -d "$TOOLKIT_DIR/docx_builder" ]]; then
     echo "docx_builder not found at $TOOLKIT_DIR/docx_builder" >&2
-    echo "Run 'bash ./scripts/devspace-bootstrap.sh' first so dac-toolkit is cloned into workspace-repos/." >&2
+    echo "Synchronizing workspace repositories so dac-toolkit is available..." >&2
+    bash "$REPO_ROOT/scripts/clone-repos.sh"
+fi
+
+if [[ ! -d "$TOOLKIT_DIR/docx_builder" && -d "$REPO_ROOT/.workspace/dac-toolkit/docx_builder" ]]; then
+    TOOLKIT_DIR="$REPO_ROOT/.workspace/dac-toolkit"
+fi
+
+if [[ ! -d "$TOOLKIT_DIR/docx_builder" ]]; then
+    echo "docx_builder is still missing after repository sync." >&2
+    echo "Run 'bash ./scripts/devspace-bootstrap.sh' and confirm workspace-repos/dac-toolkit exists." >&2
     exit 1
 fi
 

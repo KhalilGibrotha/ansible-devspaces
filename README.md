@@ -169,9 +169,10 @@ The primary Mermaid render path is now workspace-local rather than Kubernetes
 Job-based. After running bootstrap, the local wrapper will:
 
 1. create or reuse a Python virtual environment
-2. install `docx-builder` from `workspace-repos/dac-toolkit/docx_builder`
-3. rewrite Mermaid fences to PNG assets through the Kroki sidecar
-4. run `docx-build` to generate the DOCX
+2. clone `dac-toolkit` into `workspace-repos/` automatically if it is missing
+3. install `docx-builder` from `workspace-repos/dac-toolkit/docx_builder`
+4. rewrite Mermaid fences to PNG assets through the Kroki sidecar
+5. run `docx-build` to generate the DOCX
 
 Quick start:
 
@@ -181,9 +182,17 @@ set -a && . ./.docx-render-local.env && set +a
 make docx-render-local
 ```
 
-The default sample input is `examples/docx/sample-mermaid-architecture.md` and
-the default output path is
-`examples/docx/output/sample-mermaid-architecture.docx`.
+The default sample input is `examples/docx/sample-diagram-gallery.md` and the
+default output path is `examples/docx/output/sample-diagram-gallery.docx`.
+
+The sample gallery currently exercises Mermaid plus five additional
+Kroki-supported languages:
+
+- `plantuml`
+- `graphviz`
+- `d2`
+- `structurizr`
+- `pikchr`
 
 ## Experimental Mermaid-to-DOCX Rendering
 
@@ -220,7 +229,7 @@ bash ./scripts/docx-renderer.sh logs-job
 ```
 
 There is a ready-made test document at
-`examples/docx/sample-mermaid-architecture.md` plus a matching sample
+`examples/docx/sample-diagram-gallery.md` plus a matching sample
 `examples/docx/org.yaml` file for cover-page metadata.
 
 ## Next Steps
