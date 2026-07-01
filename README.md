@@ -156,6 +156,10 @@ set -a && . ./.docx-renderer.env && set +a
 ./scripts/docx-renderer.sh logs-job
 ```
 
+There is a ready-made test document at
+`examples/docx/sample-mermaid-architecture.md` plus a matching sample
+`examples/docx/org.yaml` file for cover-page metadata.
+
 ## Next Steps
 
 - Add Molecule scenarios and CI workflows tailored to the roles you build in

@@ -1,0 +1,6 @@
+org:
+  name: "Acme Corp"
+  dept: "Enterprise Architecture"
+  addr1: "123 Main Street"
+  addr2: "Anytown, USA"
+  url: "www.example.com"
