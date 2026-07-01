@@ -61,11 +61,3 @@ spec:
           component: ansible-tools
           commandLine: make test
         workingDir: /projects/ansible-devspaces
-      - id: post-start-bootstrap
-        exec:
-          component: ansible-tools
-          commandLine: bash ./scripts/devspace-post-start.sh
-        workingDir: /projects/ansible-devspaces
-    events:
-      postStart:
-        - post-start-bootstrap

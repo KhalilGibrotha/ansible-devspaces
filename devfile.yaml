@@ -82,12 +82,3 @@ commands:
       component: ansible-tools
       commandLine: /bin/bash
       hotReloadCapable: true
-  - id: post-start-bootstrap
-    exec:
-      label: Best-effort post-start bootstrap
-      component: ansible-tools
-      workingDir: /projects/ansible-devspaces
-      commandLine: bash ./scripts/devspace-post-start.sh
-events:
-  postStart:
-    - post-start-bootstrap
