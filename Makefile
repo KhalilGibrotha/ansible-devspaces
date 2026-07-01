@@ -1,7 +1,8 @@
-.PHONY: bootstrap lint syntax-check test smoke clean-workspace
+.PHONY: bootstrap lint syntax-check test smoke docx-renderer-test print-kroki-manifest print-docx-job clean-workspace
 
 ANSIBLE_PLAYBOOK ?= ansible-playbook
 ANSIBLE_LINT ?= ansible-lint
+PYTHON ?= python
 
 bootstrap:
 	./scripts/clone-repos.sh
@@ -20,6 +21,15 @@ test: lint syntax-check
 
 smoke:
 	$(ANSIBLE_PLAYBOOK) -i inventories/hosts.ini playbooks/site.yml
+
+docx-renderer-test:
+	$(PYTHON) -m unittest discover -s tests -p "test_docx_renderer.py"
+
+print-kroki-manifest:
+	./scripts/docx-renderer.sh print-kroki
+
+print-docx-job:
+	./scripts/docx-renderer.sh print-job
 
 clean-workspace:
 	rm -rf .workspace

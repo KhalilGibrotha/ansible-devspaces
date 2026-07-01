@@ -2,6 +2,8 @@
 # Upstream Dev Spaces helpers
 https://github.com/ansible/ansible-dev-tools/tree/main/devspaces ansible-dev-tools-devspaces
 https://github.com/ansible/ansible-dev-tools ansible-dev-tools
+# Local DOCX rendering dependency
+https://github.com/KhalilGibrotha/dac-toolkit dac-toolkit
 # Example application repositories to exercise against
 https://github.com/ansible-collections/ansible.windows
 https://github.com/ansible-collections/community.windows
