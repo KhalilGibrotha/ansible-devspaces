@@ -17,7 +17,7 @@ specifications.
   (`devfile.yaml`) describing the workspace container, commands, and startup
   hooks.
 - **Bootstrap automation** (`scripts/clone-repos.sh` + `repos-to-clone.txt`)
-  that materializes upstream Ansible dependencies inside `.workspace/` on every
+  that materializes upstream Ansible dependencies inside `workspace-repos/` on every
   launch.
 - **Bootstrap wrapper** (`scripts/devspace-bootstrap.sh`) that runs clone and
   Galaxy dependency install as one explicit post-start action.
@@ -56,7 +56,8 @@ specifications.
 3. **Manual bootstrap after workspace start**: once the IDE opens, run the
    `Bootstrap workspace dependencies` command from the Dev Spaces UI, or run
    `bash ./scripts/devspace-bootstrap.sh` from the terminal to fetch upstream
-   content and dependencies.
+   content and dependencies. Cloned repos will appear in the visible
+   `workspace-repos/` folder.
 4. **Run the smoke test**: execute the `Run sample site playbook` command or
    run `ansible-playbook playbooks/site.yml` manually. The playbook installs
    developer tooling, surfaces the injected domain credentials, and writes
@@ -168,7 +169,7 @@ The primary Mermaid render path is now workspace-local rather than Kubernetes
 Job-based. After running bootstrap, the local wrapper will:
 
 1. create or reuse a Python virtual environment
-2. install `docx-builder` from `.workspace/dac-toolkit/docx_builder`
+2. install `docx-builder` from `workspace-repos/dac-toolkit/docx_builder`
 3. rewrite Mermaid fences to PNG assets through the Kroki sidecar
 4. run `docx-build` to generate the DOCX
 

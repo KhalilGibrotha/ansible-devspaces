@@ -1,9 +1,9 @@
-# URL [destination relative to .workspace/]
+# URL [destination relative to workspace-repos/] [optional branch]
 # Upstream Dev Spaces helpers
 https://github.com/ansible/ansible-dev-tools/tree/main/devspaces ansible-dev-tools-devspaces
 https://github.com/ansible/ansible-dev-tools ansible-dev-tools
 # Local DOCX rendering dependency
-https://github.com/KhalilGibrotha/dac-toolkit dac-toolkit
+https://github.com/KhalilGibrotha/dac-toolkit dac-toolkit codex/docx-diagram-sizing
 # Example application repositories to exercise against
 https://github.com/ansible-collections/ansible.windows
 https://github.com/ansible-collections/community.windows

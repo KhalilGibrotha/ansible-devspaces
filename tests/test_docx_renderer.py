@@ -42,7 +42,7 @@ class RewriteMarkdownTests(unittest.TestCase):
                 markdown,
                 output_markdown_path=output_markdown,
                 assets_dir=assets_dir,
-                renderer=lambda diagram: f"rendered:{diagram}".encode("utf-8"),
+                renderer=lambda diagram_type, diagram: f"{diagram_type}:{diagram}".encode("utf-8"),
             )
 
             self.assertEqual(rendered, 1)
@@ -52,7 +52,7 @@ class RewriteMarkdownTests(unittest.TestCase):
             )
             self.assertEqual(
                 (assets_dir / "mermaid-001.png").read_bytes(),
-                b"rendered:graph TD\n  A-->B",
+                b"mermaid:graph TD\n  A-->B",
             )
 
     def test_numbers_multiple_diagrams_deterministically(self):
@@ -70,12 +70,36 @@ class RewriteMarkdownTests(unittest.TestCase):
                 markdown,
                 output_markdown_path=output_markdown,
                 assets_dir=assets_dir,
-                renderer=lambda diagram: diagram.encode("utf-8"),
+                renderer=lambda diagram_type, diagram: diagram.encode("utf-8"),
             )
 
             self.assertEqual(rendered, 2)
             self.assertIn("generated/mermaid-001.png", rewritten)
             self.assertIn("generated/mermaid-002.png", rewritten)
+
+    def test_rewrites_supported_non_mermaid_diagram_fences(self):
+        markdown = (
+            "```plantuml\n@startuml\nAlice -> Bob: hi\n@enduml\n```\n"
+        )
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            output_markdown = root / "rewritten.md"
+            assets_dir = root / "generated"
+
+            rewritten, rendered = rewrite_markdown(
+                markdown,
+                output_markdown_path=output_markdown,
+                assets_dir=assets_dir,
+                renderer=lambda diagram_type, diagram: f"{diagram_type}:{diagram}".encode("utf-8"),
+            )
+
+            self.assertEqual(rendered, 1)
+            self.assertIn("![Generated Plantuml diagram 1](generated/plantuml-001.png)", rewritten)
+            self.assertEqual(
+                (assets_dir / "plantuml-001.png").read_bytes(),
+                b"plantuml:@startuml\nAlice -> Bob: hi\n@enduml",
+            )
 
 
 if __name__ == "__main__":

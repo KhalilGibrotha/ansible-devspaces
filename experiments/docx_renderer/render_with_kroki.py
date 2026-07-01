@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Rewrite Mermaid fences into PNG image references using a Kroki endpoint."""
+"""Rewrite Kroki-supported fenced diagrams into PNG image references."""
 
 from __future__ import annotations
 
@@ -10,12 +10,42 @@ import urllib.request
 from pathlib import Path
 from typing import Callable
 
-MERMAID_FENCE_RE = re.compile(r"```mermaid[^\n]*\n(.*?)\n```", re.DOTALL)
+SUPPORTED_DIAGRAM_TYPES = {
+    "mermaid": "mermaid",
+    "plantuml": "plantuml",
+    "c4plantuml": "c4plantuml",
+    "graphviz": "graphviz",
+    "dot": "graphviz",
+    "d2": "d2",
+    "pikchr": "pikchr",
+    "erd": "erd",
+    "svgbob": "svgbob",
+    "nomnoml": "nomnoml",
+    "structurizr": "structurizr",
+    "ditaa": "ditaa",
+    "seqdiag": "seqdiag",
+    "blockdiag": "blockdiag",
+    "nwdiag": "nwdiag",
+    "packetdiag": "packetdiag",
+    "rackdiag": "rackdiag",
+    "umlet": "umlet",
+    "vega": "vega",
+    "vegalite": "vegalite",
+    "wavedrom": "wavedrom",
+    "wireviz": "wireviz",
+    "dbml": "dbml",
+    "bpmn": "bpmn",
+    "excalidraw": "excalidraw",
+    "bytefield": "bytefield",
+    "goat": "goat",
+}
+
+FENCE_RE = re.compile(r"```([A-Za-z0-9_-]+)[^\n]*\n(.*?)\n```", re.DOTALL)
 
 
-def render_mermaid_png(diagram_source: str, kroki_url: str) -> bytes:
-    """Render a Mermaid diagram to PNG bytes using Kroki."""
-    endpoint = f"{kroki_url.rstrip('/')}/mermaid/png"
+def render_diagram_png(diagram_type: str, diagram_source: str, kroki_url: str) -> bytes:
+    """Render a Kroki-supported diagram to PNG bytes."""
+    endpoint = f"{kroki_url.rstrip('/')}/{diagram_type}/png"
     request = urllib.request.Request(
         endpoint,
         data=diagram_source.encode("utf-8"),
@@ -33,7 +63,7 @@ def rewrite_markdown(
     assets_dir: Path,
     renderer: Callable[[str], bytes],
 ) -> tuple[str, int]:
-    """Replace Mermaid fences with image references and write PNG assets."""
+    """Replace supported diagram fences with image references and write PNG assets."""
     output_markdown_path.parent.mkdir(parents=True, exist_ok=True)
     assets_dir.mkdir(parents=True, exist_ok=True)
 
@@ -41,18 +71,23 @@ def rewrite_markdown(
     rewritten_parts: list[str] = []
     last_index = 0
 
-    for match in MERMAID_FENCE_RE.finditer(markdown_text):
+    for match in FENCE_RE.finditer(markdown_text):
+        language = match.group(1).strip().lower()
+        kroki_type = SUPPORTED_DIAGRAM_TYPES.get(language)
+        if not kroki_type:
+            continue
         rendered += 1
         rewritten_parts.append(markdown_text[last_index:match.start()])
 
-        asset_name = f"mermaid-{rendered:03d}.png"
+        asset_name = f"{kroki_type}-{rendered:03d}.png"
         asset_path = assets_dir / asset_name
-        asset_path.write_bytes(renderer(match.group(1).strip()))
+        asset_path.write_bytes(renderer(kroki_type, match.group(2).strip()))
 
         relative_asset_path = os.path.relpath(asset_path, output_markdown_path.parent)
         relative_asset_path = relative_asset_path.replace(os.sep, "/")
+        human_label = language.upper() if language in {"d2", "dbml", "bpmn"} else language.capitalize()
         rewritten_parts.append(
-            f"![Generated Mermaid diagram {rendered}]({relative_asset_path})"
+            f"![Generated {human_label} diagram {rendered}]({relative_asset_path})"
         )
         last_index = match.end()
 
@@ -62,7 +97,7 @@ def rewrite_markdown(
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Rewrite Mermaid fences into Kroki-rendered PNG image references."
+        description="Rewrite Kroki-supported fenced diagrams into PNG image references."
     )
     parser.add_argument("--input-markdown", required=True, type=Path)
     parser.add_argument("--output-markdown", required=True, type=Path)
@@ -78,11 +113,11 @@ def main() -> int:
         source_text,
         output_markdown_path=args.output_markdown,
         assets_dir=args.assets_dir,
-        renderer=lambda diagram: render_mermaid_png(diagram, args.kroki_url),
+        renderer=lambda diagram_type, diagram: render_diagram_png(diagram_type, diagram, args.kroki_url),
     )
     args.output_markdown.write_text(rewritten_text, encoding="utf-8")
     print(
-        f"Rendered {rendered} Mermaid diagram(s) from {args.input_markdown} "
+        f"Rendered {rendered} Kroki-supported diagram(s) from {args.input_markdown} "
         f"to {args.output_markdown} using {args.kroki_url}"
     )
     return 0

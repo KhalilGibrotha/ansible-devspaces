@@ -5,7 +5,7 @@ set -euo pipefail
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 REPO_ROOT=$(cd "$SCRIPT_DIR/.." && pwd)
 
-TOOLKIT_DIR="${TOOLKIT_DIR:-$REPO_ROOT/.workspace/dac-toolkit}"
+TOOLKIT_DIR="${TOOLKIT_DIR:-$REPO_ROOT/workspace-repos/dac-toolkit}"
 INPUT_MARKDOWN="${INPUT_MARKDOWN:-$REPO_ROOT/examples/docx/sample-mermaid-architecture.md}"
 OUTPUT_DOCX="${OUTPUT_DOCX:-$REPO_ROOT/examples/docx/output/sample-mermaid-architecture.docx}"
 ASSETS_DIR="${ASSETS_DIR:-$REPO_ROOT/examples/docx/output/generated-diagrams}"
@@ -13,12 +13,16 @@ REWRITTEN_MARKDOWN="${REWRITTEN_MARKDOWN:-/tmp/rendered-with-kroki.md}"
 ORG_YAML="${ORG_YAML:-$REPO_ROOT/examples/docx/org.yaml}"
 LOGO_PATH="${LOGO_PATH:-}"
 KROKI_URL="${KROKI_URL:-http://127.0.0.1:8000}"
-VENV_DIR="${VENV_DIR:-$REPO_ROOT/.workspace/.venv-docx-render}"
+VENV_DIR="${VENV_DIR:-$REPO_ROOT/workspace-repos/.venv-docx-render}"
 PYTHON_BIN="${PYTHON_BIN:-python3}"
+
+if [[ ! -d "$TOOLKIT_DIR/docx_builder" && -d "$REPO_ROOT/.workspace/dac-toolkit/docx_builder" ]]; then
+    TOOLKIT_DIR="$REPO_ROOT/.workspace/dac-toolkit"
+fi
 
 if [[ ! -d "$TOOLKIT_DIR/docx_builder" ]]; then
     echo "docx_builder not found at $TOOLKIT_DIR/docx_builder" >&2
-    echo "Run 'bash ./scripts/devspace-bootstrap.sh' first so dac-toolkit is cloned into .workspace/." >&2
+    echo "Run 'bash ./scripts/devspace-bootstrap.sh' first so dac-toolkit is cloned into workspace-repos/." >&2
     exit 1
 fi
 

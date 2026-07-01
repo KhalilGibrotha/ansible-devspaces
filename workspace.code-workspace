@@ -19,6 +19,14 @@
     {
       "name": "scripts",
       "path": "scripts"
+    },
+    {
+      "name": "workspace-repos",
+      "path": "workspace-repos"
+    },
+    {
+      "name": "dac-toolkit",
+      "path": "workspace-repos/dac-toolkit"
     }
   ],
   "settings": {
