@@ -5,7 +5,7 @@ ANSIBLE_LINT ?= ansible-lint
 PYTHON ?= python
 
 bootstrap:
-	./scripts/clone-repos.sh
+	bash ./scripts/clone-repos.sh
 	ansible-galaxy install -r requirements.yml --force
 
 lint:

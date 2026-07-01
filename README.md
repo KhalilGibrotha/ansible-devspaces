@@ -47,7 +47,7 @@ specifications.
    Red Hat demo, and applies the secret-backed environment variables
    automatically.
 3. **Manual bootstrap after workspace start**: once the IDE opens, run
-   `./scripts/clone-repos.sh` and
+   `bash ./scripts/clone-repos.sh` and
    `ansible-galaxy install -r requirements.yml --force` from the terminal to
    fetch upstream content and dependencies.
 4. **Run the smoke test**: execute the `Run sample site playbook` command or
@@ -61,7 +61,7 @@ specifications.
 After the workspace opens, run bootstrap manually:
 
 ```bash
-./scripts/clone-repos.sh
+bash ./scripts/clone-repos.sh
 ansible-galaxy install -r requirements.yml --force
 ```
 
