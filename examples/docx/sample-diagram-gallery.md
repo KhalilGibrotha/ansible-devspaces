@@ -2,7 +2,7 @@
 title: "Kroki Diagram Gallery Render Test"
 department: "Platform Engineering"
 status: "Draft"
-version: "0.2"
+version: "0.3"
 date: "2026-07-01"
 author: "Alex Gambino"
 owner: "Platform Architecture"
@@ -10,10 +10,10 @@ audience:
   - Platform Engineering
   - Architecture Review Board
 revision_history:
-  - version: "0.2"
+  - version: "0.3"
     date: "2026-07-01"
     author: "Alex Gambino"
-    description: "Expanded sample to cover multiple Kroki-supported diagram languages"
+    description: "Expanded sample to cover multiple Kroki-supported diagram languages with workspace-safe examples"
 ---
 
 ## Overview
@@ -114,49 +114,27 @@ kroki -> assets: png
 assets -> docx: embed
 ```
 
-## Structurizr
+## Seqdiag
 
 Source:
 
 ```text
-workspace {
-  model {
-    user = person "Developer"
-    docs = softwareSystem "Docs Flow"
-    render = container docs "Renderer"
-    kroki = container docs "Kroki"
-    user -> render "renders"
-    render -> kroki "requests diagram"
-  }
-  views {
-    systemContext docs "context" {
-      include *
-      autolayout lr
-    }
-    theme default
-  }
+seqdiag {
+  Developer -> Renderer [label = "render doc"];
+  Renderer -> Kroki [label = "convert diagram"];
+  Kroki => Renderer [label = "PNG"];
+  Renderer => Developer [label = "DOCX"];
 }
 ```
 
 Rendered:
 
-```structurizr
-workspace {
-  model {
-    user = person "Developer"
-    docs = softwareSystem "Docs Flow"
-    render = container docs "Renderer"
-    kroki = container docs "Kroki"
-    user -> render "renders"
-    render -> kroki "requests diagram"
-  }
-  views {
-    systemContext docs "context" {
-      include *
-      autolayout lr
-    }
-    theme default
-  }
+```seqdiag
+seqdiag {
+  Developer -> Renderer [label = "render doc"];
+  Renderer -> Kroki [label = "convert diagram"];
+  Kroki => Renderer [label = "PNG"];
+  Renderer => Developer [label = "DOCX"];
 }
 ```
 

@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import os
 import re
+import urllib.error
 import urllib.request
 from pathlib import Path
 from typing import Callable
@@ -43,6 +44,10 @@ SUPPORTED_DIAGRAM_TYPES = {
 FENCE_RE = re.compile(r"```([A-Za-z0-9_-]+)[^\n]*\n(.*?)\n```", re.DOTALL)
 
 
+class DiagramRenderError(RuntimeError):
+    """Raised when Kroki rejects a specific diagram block."""
+
+
 def render_diagram_png(diagram_type: str, diagram_source: str, kroki_url: str) -> bytes:
     """Render a Kroki-supported diagram to PNG bytes."""
     endpoint = f"{kroki_url.rstrip('/')}/{diagram_type}/png"
@@ -52,8 +57,16 @@ def render_diagram_png(diagram_type: str, diagram_source: str, kroki_url: str) -
         headers={"Content-Type": "text/plain; charset=utf-8"},
         method="POST",
     )
-    with urllib.request.urlopen(request, timeout=60) as response:
-        return response.read()
+    try:
+        with urllib.request.urlopen(request, timeout=60) as response:
+            return response.read()
+    except urllib.error.HTTPError as exc:
+        preview = diagram_source.strip().splitlines()
+        preview_text = preview[0] if preview else "<empty>"
+        raise DiagramRenderError(
+            f"Kroki rejected {diagram_type} diagram at {endpoint}: "
+            f"HTTP {exc.code} {exc.reason}. First line: {preview_text}"
+        ) from exc
 
 
 def rewrite_markdown(

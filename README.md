@@ -191,7 +191,7 @@ Kroki-supported languages:
 - `plantuml`
 - `graphviz`
 - `d2`
-- `structurizr`
+- `seqdiag`
 - `pikchr`
 
 ## Experimental Mermaid-to-DOCX Rendering
