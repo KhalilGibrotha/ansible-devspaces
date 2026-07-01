@@ -6,10 +6,11 @@ attributes:
   controller.devfile.io/storage-type: ephemeral
 projects:
   - name: ansible-devspaces
-    source:
-      type: git
-      location: "${PROJECT_SOURCE:-https://github.com/KhalilGibrotha/ansible-devspaces}"
-      branch: "${PROJECT_BRANCH:-develop}"
+    git:
+      remotes:
+        origin: "${PROJECT_SOURCE:-https://github.com/KhalilGibrotha/ansible-devspaces}"
+      checkoutFrom:
+        revision: "${PROJECT_BRANCH:-develop}"
 components:
   - name: ansible-tools
     container:
@@ -22,16 +23,6 @@ components:
       env:
         - name: ANSIBLE_CONFIG
           value: /projects/ansible-devspaces/ansible.cfg
-        - name: DOMAIN_USERNAME
-          valueFrom:
-            secretKeyRef:
-              name: domain-credentials
-              key: username
-        - name: DOMAIN_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: domain-credentials
-              key: password
         - name: PIP_CACHE_DIR
           value: /tmp/pip-cache
         - name: PYTHONUNBUFFERED
