@@ -101,17 +101,23 @@ digraph G {
 Source:
 
 ```text
-devspace -> kroki: render
-kroki -> assets: png
-assets -> docx: embed
+devspace: "Dev Space"
+kroki: "Kroki"
+docx: "DOCX"
+
+devspace -> kroki: "render request"
+kroki -> docx: "embed image"
 ```
 
 Rendered:
 
 ```d2
-devspace -> kroki: render
-kroki -> assets: png
-assets -> docx: embed
+devspace: "Dev Space"
+kroki: "Kroki"
+docx: "DOCX"
+
+devspace -> kroki: "render request"
+kroki -> docx: "embed image"
 ```
 
 ## Seqdiag
