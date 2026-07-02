@@ -43,6 +43,8 @@ specifications.
 - **Local DOCX render wrapper** (`scripts/docx-render-local.sh`) for generating
   DOCX output inside the workspace using the Kroki sidecar and a local Python
   virtual environment.
+- **Manifest runner** (`scripts/docx_manifest.py`) for listing, linting, and
+  rendering multiple manifest-managed DOCX documents.
 - **Workflow reference** ([docs/docx-workflow.md](docs/docx-workflow.md))
   documenting the current single-document flow and the proposed
   manifest-driven multi-document model.
@@ -76,8 +78,14 @@ specifications.
 7. **Validate document diagrams before rendering**: run the `Validate Markdown
    diagrams` command from the Dev Spaces UI or `make diagram-lint` from the
    terminal to catch unsupported or invalid diagram blocks early.
-8. **Render sample DOCX locally**: run the `Render sample DOCX locally` command
+8. **Validate manifest-managed documents**: run the `Validate manifest-managed
+   docs` command from the Dev Spaces UI or `make diagram-lint-all` from the
+   terminal to lint every document listed in the default manifest.
+9. **Render sample DOCX locally**: run the `Render sample DOCX locally` command
    from the Dev Spaces UI or `make docx-render-local` from the terminal.
+10. **Render manifest-managed documents**: run the `Render manifest-managed DOCX
+    docs` command from the Dev Spaces UI or `make docx-render-all` from the
+    terminal.
 
 After the workspace opens, run bootstrap manually:
 
@@ -190,6 +198,21 @@ diagram source is treated as a test failure in the workspace.
 `make docx-render-local` also runs this validation step automatically against
 the selected input Markdown before it rewrites diagram fences or builds the
 final DOCX.
+
+For multi-document workflows, the repository now includes a manifest runner.
+The default manifest path is `examples/docx/render-manifest.example.yaml`.
+
+Manifest-oriented commands:
+
+```bash
+make diagram-lint-all
+make docx-render-all
+make docx-render-one DOC_ID=sample-gallery
+```
+
+These commands route through `scripts/docx_manifest.py`, which reads the
+manifest, selects the requested documents, and reuses the existing local DOCX
+render path per document.
 
 The workspace also recommends a small set of VS Code extensions for previewing
 diagram-heavy Markdown:

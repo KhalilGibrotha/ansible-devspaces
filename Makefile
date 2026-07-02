@@ -1,8 +1,10 @@
-.PHONY: bootstrap lint syntax-check diagram-lint test smoke docx-renderer-test kroki-sidecar-test docx-render-local docx-render-local-sample print-kroki-manifest print-docx-job clean-workspace
+.PHONY: bootstrap lint syntax-check diagram-lint diagram-lint-all docx-render-all docx-render-one test smoke docx-renderer-test kroki-sidecar-test docx-render-local docx-render-local-sample print-kroki-manifest print-docx-job clean-workspace
 
 ANSIBLE_PLAYBOOK ?= ansible-playbook
 ANSIBLE_LINT ?= ansible-lint
 PYTHON ?= python3
+MANIFEST ?= examples/docx/render-manifest.example.yaml
+DOC_ID ?=
 
 bootstrap:
 	bash ./scripts/devspace-bootstrap.sh
@@ -15,6 +17,9 @@ syntax-check:
 
 diagram-lint:
 	$(PYTHON) ./scripts/lint_diagrams.py
+
+diagram-lint-all:
+	$(PYTHON) ./scripts/docx_manifest.py lint --manifest "$(MANIFEST)"
 
 # Aggregate target suitable for CI or local verification
 # Ensures linting and syntax validation succeed; does not execute the playbook itself.
@@ -32,6 +37,12 @@ kroki-sidecar-test:
 
 docx-render-local:
 	bash ./scripts/docx-render-local.sh
+
+docx-render-all:
+	$(PYTHON) ./scripts/docx_manifest.py render --manifest "$(MANIFEST)"
+
+docx-render-one:
+	$(PYTHON) ./scripts/docx_manifest.py render --manifest "$(MANIFEST)" --document-id "$(DOC_ID)"
 
 docx-render-local-sample:
 	cp scripts/docx-render-local.env.example .docx-render-local.env

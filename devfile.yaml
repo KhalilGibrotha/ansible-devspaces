@@ -104,12 +104,28 @@ commands:
       commandLine: make diagram-lint
       group:
         kind: test
+  - id: validate-manifest-documents
+    exec:
+      label: Validate manifest-managed docs
+      component: ansible-tools
+      workingDir: /projects/ansible-devspaces
+      commandLine: make diagram-lint-all
+      group:
+        kind: test
   - id: render-sample-docx-local
     exec:
       label: Render sample DOCX locally
       component: ansible-tools
       workingDir: /projects/ansible-devspaces
       commandLine: bash ./scripts/docx-render-local.sh
+      group:
+        kind: run
+  - id: render-manifest-documents
+    exec:
+      label: Render manifest-managed DOCX docs
+      component: ansible-tools
+      workingDir: /projects/ansible-devspaces
+      commandLine: make docx-render-all
       group:
         kind: run
   - id: run-sample-playbook

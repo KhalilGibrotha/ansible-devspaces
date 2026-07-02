@@ -7,24 +7,32 @@ documents.
 ## Current State
 
 The repository currently supports a single-document, local-first DOCX render
-workflow driven by explicit paths and environment variables.
+workflow driven by explicit paths and environment variables, plus a first-pass
+manifest runner for batch lint/render operations.
 
 Current capabilities:
 
 - `make kroki-sidecar-test` verifies the local Kroki sidecar.
 - `make diagram-lint` scans Markdown for Kroki-supported fenced diagrams and
   validates them against the local Kroki `/png` endpoints.
+- `make diagram-lint-all` reads the default manifest and validates every
+  manifest-managed document.
 - `make docx-render-local`:
   - ensures `dac-toolkit` is cloned into `workspace-repos/`
   - installs `docx_builder` into a local virtual environment
   - validates diagram fences in the selected input Markdown
   - rewrites diagram fences into generated PNG assets
   - runs `docx-build` to produce a DOCX
+- `make docx-render-all` reads the default manifest and renders every
+  manifest-managed document through the existing local DOCX path.
+- `make docx-render-one DOC_ID=...` renders a single manifest-managed document.
 
 Current limitations:
 
-- The workflow is centered on one input file at a time.
-- Selection of renderable documents is path-based, not manifest-based.
+- The batch runner executes the existing one-document render script per
+  manifest entry, so environment setup is reused but not yet optimized as a
+  single in-process build graph.
+- Manifest paths are repo-root-relative and intentionally simple for now.
 - Diagram source reuse across documents is a convention, not a first-class
   feature.
 - Generated diagram assets are tied to a single document render run rather than
@@ -154,13 +162,12 @@ transparent and avoids building an inclusion engine too early.
 
 ## Recommended Command Surface
 
-Once manifest support is implemented, the workflow should evolve toward these
-commands:
+The repository now has a minimal first-pass manifest command surface:
 
 ```text
 make diagram-lint
 make diagram-lint-all
-make docx-render-one DOC=docs/publish/architecture.md
+make docx-render-one DOC_ID=architecture
 make docx-render-all
 ```
 
@@ -174,6 +181,16 @@ Suggested meanings:
   render a single document intentionally.
 - `make docx-render-all`:
   render every manifest entry into the build directory.
+
+The current implementation uses:
+
+```text
+MANIFEST ?= examples/docx/render-manifest.example.yaml
+make docx-render-one DOC_ID=sample-gallery
+```
+
+The eventual intent is to preserve this shape while allowing a repository-local
+non-example manifest to become the default.
 
 ## CI / DaC Flow
 
