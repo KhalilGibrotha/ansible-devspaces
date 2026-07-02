@@ -212,6 +212,33 @@ make docx-render-one DOC_ID=sample-gallery
 The sample reference manifest remains at
 `examples/docx/render-manifest.example.yaml` for comparison and experimentation.
 
+### Dev Space Working Folder
+
+For Dev Space usage, rendered outputs can be redirected into an unversioned
+workspace root by setting `DOCX_WORK_ROOT`.
+
+Current behavior:
+
+- manifest paths stay repo-relative and readable
+- if `DOCX_WORK_ROOT` is set, repo-local output targets are mirrored under
+  `<DOCX_WORK_ROOT>/<repo-name>/...`
+- the bootstrap script prepares `/projects/.docx-work` by default in a typical
+  Dev Spaces layout
+- outputs that already point outside the repo tree are left unchanged
+
+Example:
+
+```text
+DOCX_WORK_ROOT=/projects/.docx-work
+make docx-render-one DOC_ID=sample-gallery
+```
+
+That yields a DOCX path like:
+
+```text
+/projects/.docx-work/ansible-devspaces/docs/build/docx/sample-diagram-gallery.docx
+```
+
 ## CI / DaC Flow
 
 For a docs-focused repository, the recommended DaC flow is:

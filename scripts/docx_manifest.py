@@ -75,6 +75,14 @@ def _resolve_manifest_path(raw_value: str, parent_manifest: Path) -> Path:
     return parent_manifest.parent / path
 
 
+def _find_repo_root(path: Path) -> Path:
+    current = path.resolve()
+    for candidate in (current, *current.parents):
+        if (candidate / ".git").exists():
+            return candidate
+    return path.parent.resolve()
+
+
 def _resolve_path_from_manifest(raw_value: str | None, manifest_path: Path) -> Path | None:
     if raw_value in (None, ""):
         return None
@@ -182,6 +190,48 @@ def load_manifest(path: Path) -> list[DocumentSpec]:
     return _load_manifest(path, active_manifests=(), inherited_defaults=ManifestDefaults())
 
 
+def _relocate_if_within_repo(path: Path, *, repo_root: Path, workspace_root: Path) -> Path:
+    resolved = path.resolve()
+    try:
+        relative = resolved.relative_to(repo_root)
+    except ValueError:
+        return path
+    return workspace_root / repo_root.name / relative
+
+
+def apply_workspace_output_root(
+    specs: list[DocumentSpec],
+    *,
+    manifest_path: Path,
+    workspace_output_root: Path | None,
+) -> list[DocumentSpec]:
+    if workspace_output_root is None:
+        return specs
+
+    repo_root = _find_repo_root(manifest_path)
+    workspace_root = workspace_output_root.resolve()
+    relocated_specs: list[DocumentSpec] = []
+
+    for spec in specs:
+        relocated_specs.append(
+            DocumentSpec(
+                id=spec.id,
+                input=spec.input,
+                output=_relocate_if_within_repo(spec.output, repo_root=repo_root, workspace_root=workspace_root),
+                rewritten_markdown=_relocate_if_within_repo(
+                    spec.rewritten_markdown,
+                    repo_root=repo_root,
+                    workspace_root=workspace_root,
+                ),
+                assets_dir=_relocate_if_within_repo(spec.assets_dir, repo_root=repo_root, workspace_root=workspace_root),
+                org=spec.org,
+                logo=spec.logo,
+            )
+        )
+
+    return relocated_specs
+
+
 def select_documents(specs: list[DocumentSpec], *, document_id: str | None) -> list[DocumentSpec]:
     if document_id is None:
         return specs
@@ -261,6 +311,7 @@ def parse_args() -> argparse.Namespace:
     render_parser.add_argument("--kroki-url", default="http://127.0.0.1:8000")
     render_parser.add_argument("--toolkit-dir", type=Path, default=None)
     render_parser.add_argument("--venv-dir", type=Path, default=None)
+    render_parser.add_argument("--workspace-output-root", type=Path, default=None)
 
     return parser.parse_args()
 
@@ -269,6 +320,12 @@ def main() -> int:
     args = parse_args()
     manifest_path = args.manifest if args.manifest.is_absolute() else REPO_ROOT / args.manifest
     specs = select_documents(load_manifest(manifest_path), document_id=getattr(args, "document_id", None))
+    workspace_output_root = getattr(args, "workspace_output_root", None)
+    if workspace_output_root is None:
+        raw_workspace_output_root = os.environ.get("DOCX_WORK_ROOT", "").strip()
+        if raw_workspace_output_root:
+            workspace_output_root = Path(raw_workspace_output_root)
+    specs = apply_workspace_output_root(specs, manifest_path=manifest_path, workspace_output_root=workspace_output_root)
 
     if args.command == "list":
         for spec in specs:

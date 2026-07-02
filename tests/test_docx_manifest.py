@@ -2,7 +2,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from scripts.docx_manifest import load_manifest, select_documents
+from scripts.docx_manifest import apply_workspace_output_root, load_manifest, select_documents
 
 
 class DocxManifestTests(unittest.TestCase):
@@ -219,6 +219,57 @@ documents:
             self.assertTrue(str(specs[0].org).endswith("overrides\\custom-org.yaml") or str(specs[0].org).endswith("overrides/custom-org.yaml"))
             self.assertTrue(str(specs[0].logo).endswith("overrides\\custom-logo.jpg") or str(specs[0].logo).endswith("overrides/custom-logo.jpg"))
             self.assertTrue(str(specs[0].output).endswith("exports\\custom.docx") or str(specs[0].output).endswith("exports/custom.docx"))
+
+    def test_apply_workspace_output_root_relocates_repo_relative_outputs(self):
+        manifest = """\
+defaults:
+  output_root: docs/build
+documents:
+  - id: architecture
+    input: docs/publish/architecture.md
+"""
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            repo_root = Path(tmpdir) / "architecture-docs"
+            repo_root.mkdir()
+            (repo_root / ".git").mkdir()
+            manifest_path = repo_root / "render-manifest.yaml"
+            manifest_path.write_text(manifest, encoding="utf-8")
+
+            specs = load_manifest(manifest_path)
+            relocated = apply_workspace_output_root(
+                specs,
+                manifest_path=manifest_path,
+                workspace_output_root=repo_root.parent / ".docx-work",
+            )
+
+            self.assertTrue(str(relocated[0].output).endswith(".docx-work\\architecture-docs\\docs\\build\\docx\\architecture.docx") or str(relocated[0].output).endswith(".docx-work/architecture-docs/docs/build/docx/architecture.docx"))
+            self.assertTrue(str(relocated[0].rewritten_markdown).endswith(".docx-work\\architecture-docs\\docs\\build\\rewritten\\architecture.md") or str(relocated[0].rewritten_markdown).endswith(".docx-work/architecture-docs/docs/build/rewritten/architecture.md"))
+            self.assertTrue(str(relocated[0].assets_dir).endswith(".docx-work\\architecture-docs\\docs\\build\\diagrams\\architecture") or str(relocated[0].assets_dir).endswith(".docx-work/architecture-docs/docs/build/diagrams/architecture"))
+
+    def test_apply_workspace_output_root_leaves_external_outputs_unchanged(self):
+        manifest = """\
+documents:
+  - id: architecture
+    input: docs/publish/architecture.md
+    output: /tmp/custom.docx
+"""
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            repo_root = Path(tmpdir) / "architecture-docs"
+            repo_root.mkdir()
+            (repo_root / ".git").mkdir()
+            manifest_path = repo_root / "render-manifest.yaml"
+            manifest_path.write_text(manifest, encoding="utf-8")
+
+            specs = load_manifest(manifest_path)
+            relocated = apply_workspace_output_root(
+                specs,
+                manifest_path=manifest_path,
+                workspace_output_root=repo_root.parent / ".docx-work",
+            )
+
+            self.assertEqual(specs[0].output, relocated[0].output)
 
 
 if __name__ == "__main__":

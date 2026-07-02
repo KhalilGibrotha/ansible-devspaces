@@ -15,6 +15,7 @@ LOGO_PATH="${LOGO_PATH:-}"
 KROKI_URL="${KROKI_URL:-http://127.0.0.1:8000}"
 VENV_DIR="${VENV_DIR:-$REPO_ROOT/workspace-repos/.venv-docx-render}"
 PYTHON_BIN="${PYTHON_BIN:-python3}"
+DOCX_WORK_ROOT="${DOCX_WORK_ROOT:-$(cd "$REPO_ROOT/.." && pwd)/.docx-work}"
 
 if [[ ! -d "$TOOLKIT_DIR/docx_builder" && -d "$REPO_ROOT/.workspace/dac-toolkit/docx_builder" ]]; then
     TOOLKIT_DIR="$REPO_ROOT/.workspace/dac-toolkit"
@@ -41,7 +42,7 @@ if [[ ! -f "$INPUT_MARKDOWN" ]]; then
     exit 1
 fi
 
-mkdir -p "$(dirname "$OUTPUT_DOCX")" "$ASSETS_DIR" "$VENV_DIR"
+mkdir -p "$(dirname "$OUTPUT_DOCX")" "$ASSETS_DIR" "$VENV_DIR" "$DOCX_WORK_ROOT"
 
 if [[ ! -x "$VENV_DIR/bin/python" ]]; then
     "$PYTHON_BIN" -m venv "$VENV_DIR"
@@ -74,3 +75,4 @@ fi
 docx-build "$REWRITTEN_MARKDOWN" "${docx_args[@]}"
 
 echo "DOCX written to $OUTPUT_DOCX"
+echo "Workspace DOCX root: $DOCX_WORK_ROOT"
