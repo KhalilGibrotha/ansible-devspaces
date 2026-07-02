@@ -38,6 +38,8 @@ specifications.
   isolated pods.
 - **Kroki sidecar smoke test** (`scripts/verify-kroki.py`) for validating that
   a local Kroki sidecar is reachable from the main Dev Spaces container.
+- **Diagram lint step** (`scripts/lint_diagrams.py`) for validating Markdown
+  diagram fences through Kroki before attempting a full DOCX render.
 - **Local DOCX render wrapper** (`scripts/docx-render-local.sh`) for generating
   DOCX output inside the workspace using the Kroki sidecar and a local Python
   virtual environment.
@@ -68,9 +70,11 @@ specifications.
 6. **Verify Kroki sidecar**: run the `Verify Kroki sidecar` command from the
    Dev Spaces UI or `make kroki-sidecar-test` from the terminal to confirm the
    sidecar responds to `/health` and can render a sample Mermaid diagram.
-7. **Render sample DOCX locally**: run the `Render sample DOCX locally` command
-   from the Dev Spaces UI or `make docx-render-local` from the terminal once
-   bootstrap has cloned `dac-toolkit` into `.workspace/`.
+7. **Validate document diagrams before rendering**: run the `Validate Markdown
+   diagrams` command from the Dev Spaces UI or `make diagram-lint` from the
+   terminal to catch unsupported or invalid diagram blocks early.
+8. **Render sample DOCX locally**: run the `Render sample DOCX locally` command
+   from the Dev Spaces UI or `make docx-render-local` from the terminal.
 
 After the workspace opens, run bootstrap manually:
 
@@ -162,6 +166,35 @@ make kroki-sidecar-test
 
 Or run the `Verify Kroki sidecar` command in the Dev Spaces UI. Successful
 output confirms both the health endpoint and a sample Mermaid SVG render work.
+
+## Diagram Authoring Workflow
+
+For documentation work, validate diagram fences before committing or building a
+DOCX:
+
+```bash
+make diagram-lint
+```
+
+This scans Markdown under `examples/docx/`, finds Kroki-supported fenced code
+blocks, and submits each one to the local Kroki sidecar. Failures are reported
+with file, line number, and diagram language so authors can fix the source
+before running `docx-build`.
+
+The aggregate `make test` target now includes `make diagram-lint`, so broken
+diagram source is treated as a test failure in the workspace.
+
+The workspace also recommends a small set of VS Code extensions for previewing
+diagram-heavy Markdown:
+
+- `shd101wyy.markdown-preview-enhanced`
+- `bierner.markdown-mermaid`
+- `jebbs.plantuml`
+- `tintinweb.graphviz-interactive-preview`
+
+The best all-around preview path for this repo is `Markdown Preview Enhanced`,
+because it handles Markdown-centric authoring with embedded Mermaid, PlantUML,
+and Graphviz blocks in one UI.
 
 ## Local Mermaid-to-DOCX Flow
 

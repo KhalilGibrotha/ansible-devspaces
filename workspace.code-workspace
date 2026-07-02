@@ -29,7 +29,26 @@
       "path": "workspace-repos/dac-toolkit"
     }
   ],
+  "extensions": {
+    "recommendations": [
+      "shd101wyy.markdown-preview-enhanced",
+      "bierner.markdown-mermaid",
+      "jebbs.plantuml",
+      "tintinweb.graphviz-interactive-preview"
+    ]
+  },
   "settings": {
-    "git.ignoreLimitWarning": true
+    "git.ignoreLimitWarning": true,
+    "files.associations": {
+      "*.puml": "plantuml",
+      "*.plantuml": "plantuml",
+      "*.d2": "plaintext",
+      "*.dot": "dot"
+    },
+    "markdown-preview-enhanced.codeBlockTheme": "github.css",
+    "markdown-preview-enhanced.previewTheme": "github-light.css",
+    "markdown-preview-enhanced.mermaidTheme": "default",
+    "markdown-preview-enhanced.enableScriptExecution": true,
+    "markdown.extension.preview.autoShowPreviewToSide": true
   }
 }

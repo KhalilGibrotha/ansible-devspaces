@@ -1,8 +1,13 @@
 {
-    "editor.formatOnSave": true,
-    "editor.tabSize": 2,
-    "files.autoSave": "onWindowChange",
-    "git.ignoreLimitWarning": true,
-    "python.pythonPath": "/usr/bin/python3",
-    "extensions.ignoreRecommendations": false
+  "files.associations": {
+    "*.puml": "plantuml",
+    "*.plantuml": "plantuml",
+    "*.d2": "plaintext",
+    "*.dot": "dot"
+  },
+  "markdown-preview-enhanced.codeBlockTheme": "github.css",
+  "markdown-preview-enhanced.previewTheme": "github-light.css",
+  "markdown-preview-enhanced.mermaidTheme": "default",
+  "markdown-preview-enhanced.enableScriptExecution": true,
+  "markdown.extension.preview.autoShowPreviewToSide": true
 }

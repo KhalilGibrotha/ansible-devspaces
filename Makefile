@@ -1,4 +1,4 @@
-.PHONY: bootstrap lint syntax-check test smoke docx-renderer-test kroki-sidecar-test docx-render-local docx-render-local-sample print-kroki-manifest print-docx-job clean-workspace
+.PHONY: bootstrap lint syntax-check diagram-lint test smoke docx-renderer-test kroki-sidecar-test docx-render-local docx-render-local-sample print-kroki-manifest print-docx-job clean-workspace
 
 ANSIBLE_PLAYBOOK ?= ansible-playbook
 ANSIBLE_LINT ?= ansible-lint
@@ -13,10 +13,13 @@ lint:
 syntax-check:
 	$(ANSIBLE_PLAYBOOK) --syntax-check -i inventories/hosts.ini playbooks/site.yml
 
+diagram-lint:
+	$(PYTHON) ./scripts/lint_diagrams.py
+
 # Aggregate target suitable for CI or local verification
 # Ensures linting and syntax validation succeed; does not execute the playbook itself.
 # To run the playbook, use the separate 'smoke' target.
-test: lint syntax-check
+test: lint syntax-check diagram-lint
 
 smoke:
 	$(ANSIBLE_PLAYBOOK) -i inventories/hosts.ini playbooks/site.yml

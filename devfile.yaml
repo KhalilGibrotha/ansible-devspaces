@@ -96,6 +96,14 @@ commands:
       commandLine: python3 ./scripts/verify-kroki.py
       group:
         kind: test
+  - id: validate-doc-diagrams
+    exec:
+      label: Validate Markdown diagrams
+      component: ansible-tools
+      workingDir: /projects/ansible-devspaces
+      commandLine: make diagram-lint
+      group:
+        kind: test
   - id: render-sample-docx-local
     exec:
       label: Render sample DOCX locally
