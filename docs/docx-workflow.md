@@ -107,17 +107,12 @@ Example:
 documents:
   - id: architecture
     input: docs/publish/architecture.md
-    output: docs/build/docx/architecture.docx
-    rewritten_markdown: docs/build/rewritten/architecture.md
-    assets_dir: docs/build/diagrams/architecture
     org: examples/docx/org.yaml
     logo: ""
 
   - id: onboarding
     input: docs/publish/onboarding.md
-    output: docs/build/docx/onboarding.docx
-    rewritten_markdown: docs/build/rewritten/onboarding.md
-    assets_dir: docs/build/diagrams/onboarding
+    output_name: onboarding-guide
     org: examples/docx/org.yaml
     logo: ""
 ```
@@ -128,6 +123,18 @@ Why a manifest is preferable:
 - avoids accidental rendering of random Markdown files
 - allows per-document branding and output paths
 - creates a stable contract for CI
+
+Current default path behavior:
+
+- `id` and `input` are the only required fields
+- if `output` is omitted, DOCX output defaults to
+  `MANIFEST_DIR/build/docx/<name>.docx`
+- if `rewritten_markdown` is omitted, it defaults to
+  `MANIFEST_DIR/build/rewritten/<name>.md`
+- if `assets_dir` is omitted, it defaults to
+  `MANIFEST_DIR/build/diagrams/<name>/`
+- `output_name` can override `<name>` when the DOCX filename should differ from
+  the source Markdown basename
 
 ## DRY Diagram Reuse
 

@@ -1,24 +1,15 @@
 documents:
   - id: sample-gallery
     input: examples/docx/sample-diagram-gallery.md
-    output: docs/build/docx/sample-diagram-gallery.docx
-    rewritten_markdown: docs/build/rewritten/sample-diagram-gallery.md
-    assets_dir: docs/build/diagrams/sample-diagram-gallery
     org: examples/docx/org.yaml
     logo: ""
 
   - id: sample-mermaid
     input: examples/docx/sample-mermaid-architecture.md
-    output: docs/build/docx/sample-mermaid-architecture.docx
-    rewritten_markdown: docs/build/rewritten/sample-mermaid-architecture.md
-    assets_dir: docs/build/diagrams/sample-mermaid-architecture
     org: examples/docx/org.yaml
     logo: ""
 
   - id: logo-validation
     input: examples/docx/sample-logo-validation.md
-    output: docs/build/docx/sample-logo-validation.docx
-    rewritten_markdown: docs/build/rewritten/sample-logo-validation.md
-    assets_dir: docs/build/diagrams/sample-logo-validation
     org: examples/docx/org.yaml
     logo: examples/docx/assets/acme-sample-logo.jpg

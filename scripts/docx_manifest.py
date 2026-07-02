@@ -36,6 +36,26 @@ def _resolve_path(raw_value: str | None) -> Path | None:
     return REPO_ROOT / path
 
 
+def _docx_filename(input_path: Path, output_name: str | None) -> str:
+    candidate = (output_name or "").strip()
+    if not candidate:
+        return f"{input_path.stem}.docx"
+    if Path(candidate).suffix.lower() != ".docx":
+        return f"{candidate}.docx"
+    return candidate
+
+
+def _default_output_paths(manifest_path: Path, input_path: Path, output_name: str | None) -> tuple[Path, Path, Path]:
+    build_root = manifest_path.parent / "build"
+    docx_name = _docx_filename(input_path, output_name)
+    derived_stem = Path(docx_name).stem
+    return (
+        build_root / "docx" / docx_name,
+        build_root / "rewritten" / f"{derived_stem}.md",
+        build_root / "diagrams" / derived_stem,
+    )
+
+
 def load_manifest(path: Path) -> list[DocumentSpec]:
     data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
     documents = data.get("documents")
@@ -47,18 +67,25 @@ def load_manifest(path: Path) -> list[DocumentSpec]:
         if not isinstance(entry, dict):
             raise ValueError(f"Manifest entry {index} in {path} is not a mapping.")
 
-        required = ("id", "input", "output", "rewritten_markdown", "assets_dir")
+        required = ("id", "input")
         missing = [key for key in required if not entry.get(key)]
         if missing:
             raise ValueError(f"Manifest entry {index} in {path} is missing: {', '.join(missing)}")
 
+        input_path = _resolve_path(str(entry["input"]))
+        output_path, rewritten_markdown_path, assets_dir_path = _default_output_paths(
+            path,
+            input_path,
+            entry.get("output_name"),
+        )
+
         specs.append(
             DocumentSpec(
                 id=str(entry["id"]),
-                input=_resolve_path(str(entry["input"])),
-                output=_resolve_path(str(entry["output"])),
-                rewritten_markdown=_resolve_path(str(entry["rewritten_markdown"])),
-                assets_dir=_resolve_path(str(entry["assets_dir"])),
+                input=input_path,
+                output=_resolve_path(entry.get("output")) or output_path,
+                rewritten_markdown=_resolve_path(entry.get("rewritten_markdown")) or rewritten_markdown_path,
+                assets_dir=_resolve_path(entry.get("assets_dir")) or assets_dir_path,
                 org=_resolve_path(entry.get("org")),
                 logo=_resolve_path(entry.get("logo")),
             )
