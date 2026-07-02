@@ -42,10 +42,22 @@ SUPPORTED_DIAGRAM_TYPES = {
 }
 
 FENCE_RE = re.compile(r"```([A-Za-z0-9_-]+)[^\n]*\n(.*?)\n```", re.DOTALL)
+PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
 
 
 class DiagramRenderError(RuntimeError):
     """Raised when Kroki rejects a specific diagram block."""
+
+
+def ensure_png_bytes(payload: bytes, *, diagram_type: str, endpoint: str) -> bytes:
+    """Fail fast if Kroki returns something other than PNG bytes."""
+    if payload.startswith(PNG_SIGNATURE):
+        return payload
+    preview = payload[:80].decode("utf-8", errors="replace").replace("\n", "\\n")
+    raise DiagramRenderError(
+        f"Kroki returned a non-PNG payload for {diagram_type} at {endpoint}. "
+        f"Leading bytes: {preview}"
+    )
 
 
 def render_diagram_png(diagram_type: str, diagram_source: str, kroki_url: str) -> bytes:
@@ -59,7 +71,11 @@ def render_diagram_png(diagram_type: str, diagram_source: str, kroki_url: str) -
     )
     try:
         with urllib.request.urlopen(request, timeout=60) as response:
-            return response.read()
+            return ensure_png_bytes(
+                response.read(),
+                diagram_type=diagram_type,
+                endpoint=endpoint,
+            )
     except urllib.error.HTTPError as exc:
         preview = diagram_source.strip().splitlines()
         preview_text = preview[0] if preview else "<empty>"

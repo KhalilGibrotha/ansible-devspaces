@@ -2,10 +2,20 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from experiments.docx_renderer.render_with_kroki import rewrite_markdown
+from experiments.docx_renderer.render_with_kroki import DiagramRenderError, ensure_png_bytes, rewrite_markdown
 
 
 class RewriteMarkdownTests(unittest.TestCase):
+    def test_ensure_png_bytes_rejects_non_png_payload(self):
+        with self.assertRaises(DiagramRenderError) as ctx:
+            ensure_png_bytes(
+                b"<svg>not png</svg>",
+                diagram_type="packetdiag",
+                endpoint="http://127.0.0.1:8000/packetdiag/png",
+            )
+
+        self.assertIn("non-PNG payload", str(ctx.exception))
+
     def test_leaves_markdown_without_mermaid_unchanged(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)

@@ -14,7 +14,11 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from experiments.docx_renderer.render_with_kroki import FENCE_RE, SUPPORTED_DIAGRAM_TYPES
+from experiments.docx_renderer.render_with_kroki import (
+    FENCE_RE,
+    SUPPORTED_DIAGRAM_TYPES,
+    ensure_png_bytes,
+)
 
 
 @dataclass(frozen=True)
@@ -56,7 +60,14 @@ def validate_diagram(block: DiagramBlock, kroki_url: str, output_format: str) ->
         method="POST",
     )
     try:
-        with urllib.request.urlopen(request, timeout=60):
+        with urllib.request.urlopen(request, timeout=60) as response:
+            payload = response.read()
+            if output_format == "png":
+                ensure_png_bytes(
+                    payload,
+                    diagram_type=block.kroki_type,
+                    endpoint=endpoint,
+                )
             return
     except urllib.error.HTTPError as exc:
         raise RuntimeError(
