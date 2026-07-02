@@ -2,7 +2,7 @@
 title: "Kroki Diagram Gallery Render Test"
 department: "Platform Engineering"
 status: "Draft"
-version: "0.6"
+version: "0.7"
 date: "2026-07-01"
 author: "Alex Gambino"
 owner: "Platform Architecture"
@@ -10,10 +10,10 @@ audience:
   - Platform Engineering
   - Architecture Review Board
 revision_history:
-  - version: "0.6"
+  - version: "0.7"
     date: "2026-07-01"
     author: "Alex Gambino"
-    description: "Expanded sample to cover multiple Kroki-supported diagram languages with stable PNG-friendly examples"
+    description: "Expanded sample to cover multiple Kroki-supported diagram languages with Kroki PNG-safe examples"
 ---
 
 ## Overview
@@ -96,32 +96,40 @@ digraph G {
 }
 ```
 
-## Packetdiag
+## C4PlantUML
 
 Source:
 
 ```text
-packetdiag {
-  colwidth = 28;
-  node_height = 72;
-  internet [label = "Client"];
-  gateway [label = "Kroki"];
-  docx [label = "DOCX"];
-  internet -> gateway -> docx;
+@startuml
+!include <C4/C4_Container>
+
+Person(author, "Author")
+System_Boundary(docs, "Docs Flow") {
+  Container(renderer, "Renderer", "Python")
+  Container(kroki, "Kroki", "HTTP service")
 }
+
+Rel(author, renderer, "renders")
+Rel(renderer, kroki, "requests PNG")
+@enduml
 ```
 
 Rendered:
 
-```packetdiag
-packetdiag {
-  colwidth = 28;
-  node_height = 72;
-  internet [label = "Client"];
-  gateway [label = "Kroki"];
-  docx [label = "DOCX"];
-  internet -> gateway -> docx;
+```c4plantuml
+@startuml
+!include <C4/C4_Container>
+
+Person(author, "Author")
+System_Boundary(docs, "Docs Flow") {
+  Container(renderer, "Renderer", "Python")
+  Container(kroki, "Kroki", "HTTP service")
 }
+
+Rel(author, renderer, "renders")
+Rel(renderer, kroki, "requests PNG")
+@enduml
 ```
 
 ## Seqdiag

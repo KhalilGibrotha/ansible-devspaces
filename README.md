@@ -227,7 +227,7 @@ Kroki-supported languages:
 
 - `plantuml`
 - `graphviz`
-- `packetdiag`
+- `c4plantuml`
 - `seqdiag`
 - `blockdiag`
 
