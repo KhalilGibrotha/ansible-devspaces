@@ -104,6 +104,10 @@ settings.
 Example:
 
 ```yaml
+includes:
+  - manifests/networking.yaml
+  - manifests/platform.yaml
+
 documents:
   - id: architecture
     input: docs/publish/architecture.md
@@ -127,6 +131,7 @@ Why a manifest is preferable:
 Current default path behavior:
 
 - `id` and `input` are the only required fields
+- `includes` can pull in child manifests relative to the current manifest file
 - if `output` is omitted, DOCX output defaults to
   `MANIFEST_DIR/build/docx/<name>.docx`
 - if `rewritten_markdown` is omitted, it defaults to
@@ -135,6 +140,8 @@ Current default path behavior:
   `MANIFEST_DIR/build/diagrams/<name>/`
 - `output_name` can override `<name>` when the DOCX filename should differ from
   the source Markdown basename
+- duplicate `id` values across the combined manifest tree are rejected
+- include cycles are rejected
 
 ## DRY Diagram Reuse
 

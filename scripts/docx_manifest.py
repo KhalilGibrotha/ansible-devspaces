@@ -56,13 +56,42 @@ def _default_output_paths(manifest_path: Path, input_path: Path, output_name: st
     )
 
 
-def load_manifest(path: Path) -> list[DocumentSpec]:
+def _resolve_manifest_path(raw_value: str, parent_manifest: Path) -> Path:
+    path = Path(raw_value)
+    if path.is_absolute():
+        return path
+    return parent_manifest.parent / path
+
+
+def _load_manifest(path: Path, *, active_manifests: tuple[Path, ...]) -> list[DocumentSpec]:
+    if path in active_manifests:
+        chain = " -> ".join(str(item) for item in (*active_manifests, path))
+        raise ValueError(f"Manifest include cycle detected: {chain}")
+
     data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    if not isinstance(data, dict):
+        raise ValueError(f"Manifest {path} must be a mapping.")
+
     documents = data.get("documents")
-    if not isinstance(documents, list) or not documents:
-        raise ValueError(f"Manifest {path} does not define a non-empty 'documents' list.")
+    includes = data.get("includes", [])
+
+    if documents is None:
+        documents = []
+    if not isinstance(documents, list):
+        raise ValueError(f"Manifest {path} field 'documents' must be a list.")
+    if not isinstance(includes, list):
+        raise ValueError(f"Manifest {path} field 'includes' must be a list.")
+    if not documents and not includes:
+        raise ValueError(f"Manifest {path} does not define any 'documents' or 'includes'.")
 
     specs: list[DocumentSpec] = []
+    nested_active = (*active_manifests, path)
+
+    for index, raw_include in enumerate(includes, start=1):
+        if not isinstance(raw_include, str) or not raw_include.strip():
+            raise ValueError(f"Manifest include {index} in {path} must be a non-empty string.")
+        specs.extend(_load_manifest(_resolve_manifest_path(raw_include, path), active_manifests=nested_active))
+
     for index, entry in enumerate(documents, start=1):
         if not isinstance(entry, dict):
             raise ValueError(f"Manifest entry {index} in {path} is not a mapping.")
@@ -91,7 +120,17 @@ def load_manifest(path: Path) -> list[DocumentSpec]:
             )
         )
 
+    seen_ids: set[str] = set()
+    for spec in specs:
+        if spec.id in seen_ids:
+            raise ValueError(f"Duplicate document id '{spec.id}' encountered while loading manifest {path}")
+        seen_ids.add(spec.id)
+
     return specs
+
+
+def load_manifest(path: Path) -> list[DocumentSpec]:
+    return _load_manifest(path, active_manifests=())
 
 
 def select_documents(specs: list[DocumentSpec], *, document_id: str | None) -> list[DocumentSpec]:

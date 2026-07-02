@@ -89,6 +89,79 @@ documents:
             self.assertTrue(str(specs[0].rewritten_markdown).endswith("build\\rewritten\\Example Playbook Guide.md") or str(specs[0].rewritten_markdown).endswith("build/rewritten/Example Playbook Guide.md"))
             self.assertTrue(str(specs[0].assets_dir).endswith("build\\diagrams\\Example Playbook Guide") or str(specs[0].assets_dir).endswith("build/diagrams/Example Playbook Guide"))
 
+    def test_load_manifest_supports_child_manifests(self):
+        root_manifest = """\
+includes:
+  - manifests/child.yaml
+documents:
+  - id: root-doc
+    input: docs/root.md
+"""
+        child_manifest = """\
+documents:
+  - id: child-doc
+    input: docs/child.md
+"""
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            manifest_root = Path(tmpdir)
+            manifests_dir = manifest_root / "manifests"
+            manifests_dir.mkdir()
+            root_path = manifest_root / "render-manifest.yaml"
+            child_path = manifests_dir / "child.yaml"
+            root_path.write_text(root_manifest, encoding="utf-8")
+            child_path.write_text(child_manifest, encoding="utf-8")
+
+            specs = load_manifest(root_path)
+
+            self.assertEqual(["child-doc", "root-doc"], [spec.id for spec in specs])
+            self.assertTrue(str(specs[0].output).endswith("manifests\\build\\docx\\child.docx") or str(specs[0].output).endswith("manifests/build/docx/child.docx"))
+            self.assertTrue(str(specs[1].output).endswith("build\\docx\\root.docx") or str(specs[1].output).endswith("build/docx/root.docx"))
+
+    def test_load_manifest_rejects_duplicate_ids_across_child_manifests(self):
+        root_manifest = """\
+includes:
+  - child-a.yaml
+  - child-b.yaml
+"""
+        child_manifest = """\
+documents:
+  - id: duplicate-doc
+    input: docs/example.md
+"""
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            manifest_root = Path(tmpdir)
+            root_path = manifest_root / "render-manifest.yaml"
+            child_a_path = manifest_root / "child-a.yaml"
+            child_b_path = manifest_root / "child-b.yaml"
+            root_path.write_text(root_manifest, encoding="utf-8")
+            child_a_path.write_text(child_manifest, encoding="utf-8")
+            child_b_path.write_text(child_manifest, encoding="utf-8")
+
+            with self.assertRaises(ValueError):
+                load_manifest(root_path)
+
+    def test_load_manifest_rejects_include_cycles(self):
+        root_manifest = """\
+includes:
+  - child.yaml
+"""
+        child_manifest = """\
+includes:
+  - render-manifest.yaml
+"""
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            manifest_root = Path(tmpdir)
+            root_path = manifest_root / "render-manifest.yaml"
+            child_path = manifest_root / "child.yaml"
+            root_path.write_text(root_manifest, encoding="utf-8")
+            child_path.write_text(child_manifest, encoding="utf-8")
+
+            with self.assertRaises(ValueError):
+                load_manifest(root_path)
+
 
 if __name__ == "__main__":
     unittest.main()
