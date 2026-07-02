@@ -2,7 +2,7 @@
 title: "Kroki Diagram Gallery Render Test"
 department: "Platform Engineering"
 status: "Draft"
-version: "0.3"
+version: "0.4"
 date: "2026-07-01"
 author: "Alex Gambino"
 owner: "Platform Architecture"
@@ -10,10 +10,10 @@ audience:
   - Platform Engineering
   - Architecture Review Board
 revision_history:
-  - version: "0.3"
+  - version: "0.4"
     date: "2026-07-01"
     author: "Alex Gambino"
-    description: "Expanded sample to cover multiple Kroki-supported diagram languages with workspace-safe examples"
+    description: "Expanded sample to cover multiple Kroki-supported diagram languages with simplified validation-safe examples"
 ---
 
 ## Overview
@@ -101,23 +101,15 @@ digraph G {
 Source:
 
 ```text
-devspace: "Dev Space"
-kroki: "Kroki"
-docx: "DOCX"
-
-devspace -> kroki: "render request"
-kroki -> docx: "embed image"
+DevSpace -> Kroki
+Kroki -> DOCX
 ```
 
 Rendered:
 
 ```d2
-devspace: "Dev Space"
-kroki: "Kroki"
-docx: "DOCX"
-
-devspace -> kroki: "render request"
-kroki -> docx: "embed image"
+DevSpace -> Kroki
+Kroki -> DOCX
 ```
 
 ## Seqdiag

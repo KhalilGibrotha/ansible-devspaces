@@ -184,6 +184,10 @@ before running `docx-build`.
 The aggregate `make test` target now includes `make diagram-lint`, so broken
 diagram source is treated as a test failure in the workspace.
 
+`make docx-render-local` also runs this validation step automatically against
+the selected input Markdown before it rewrites diagram fences or builds the
+final DOCX.
+
 The workspace also recommends a small set of VS Code extensions for previewing
 diagram-heavy Markdown:
 
