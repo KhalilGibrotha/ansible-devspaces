@@ -43,6 +43,9 @@ specifications.
 - **Local DOCX render wrapper** (`scripts/docx-render-local.sh`) for generating
   DOCX output inside the workspace using the Kroki sidecar and a local Python
   virtual environment.
+- **Workflow reference** ([docs/docx-workflow.md](docs/docx-workflow.md))
+  documenting the current single-document flow and the proposed
+  manifest-driven multi-document model.
 
 ## Launching in Dev Spaces
 
@@ -230,6 +233,10 @@ Kroki-supported languages:
 - `c4plantuml`
 - `seqdiag`
 - `blockdiag`
+
+A manifest-oriented next-step design is documented in
+`docs/docx-workflow.md`. There is also a sample manifest at
+`examples/docx/render-manifest.example.yaml`.
 
 ## Experimental Mermaid-to-DOCX Rendering
 
