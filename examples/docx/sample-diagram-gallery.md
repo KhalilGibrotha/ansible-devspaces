@@ -2,7 +2,7 @@
 title: "Kroki Diagram Gallery Render Test"
 department: "Platform Engineering"
 status: "Draft"
-version: "0.4"
+version: "0.5"
 date: "2026-07-01"
 author: "Alex Gambino"
 owner: "Platform Architecture"
@@ -10,10 +10,10 @@ audience:
   - Platform Engineering
   - Architecture Review Board
 revision_history:
-  - version: "0.4"
+  - version: "0.5"
     date: "2026-07-01"
     author: "Alex Gambino"
-    description: "Expanded sample to cover multiple Kroki-supported diagram languages with simplified validation-safe examples"
+    description: "Expanded sample to cover multiple Kroki-supported diagram languages with PNG-friendly examples"
 ---
 
 ## Overview
@@ -96,20 +96,22 @@ digraph G {
 }
 ```
 
-## D2
+## SvgBob
 
 Source:
 
 ```text
-DevSpace -> Kroki
-Kroki -> DOCX
++--------+    +--------+    +------+
+| Author |--->| Kroki  |--->| DOCX |
++--------+    +--------+    +------+
 ```
 
 Rendered:
 
-```d2
-DevSpace -> Kroki
-Kroki -> DOCX
+```svgbob
++--------+    +--------+    +------+
+| Author |--->| Kroki  |--->| DOCX |
++--------+    +--------+    +------+
 ```
 
 ## Seqdiag
@@ -136,26 +138,30 @@ seqdiag {
 }
 ```
 
-## Pikchr
+## Blockdiag
 
 Source:
 
 ```text
-box "Author" "writes markdown"
-arrow
-box "Renderer" "rewrites diagrams"
-arrow
-box "DOCX" "final output"
+blockdiag {
+  orientation = portrait;
+  Author [label = "Author"];
+  Renderer [label = "Renderer"];
+  Docx [label = "DOCX"];
+  Author -> Renderer -> Docx;
+}
 ```
 
 Rendered:
 
-```pikchr
-box "Author" "writes markdown"
-arrow
-box "Renderer" "rewrites diagrams"
-arrow
-box "DOCX" "final output"
+```blockdiag
+blockdiag {
+  orientation = portrait;
+  Author [label = "Author"];
+  Renderer [label = "Renderer"];
+  Docx [label = "DOCX"];
+  Author -> Renderer -> Docx;
+}
 ```
 
 ## Review Notes
