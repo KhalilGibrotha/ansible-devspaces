@@ -14,3 +14,11 @@ documents:
     assets_dir: docs/build/diagrams/sample-mermaid-architecture
     org: examples/docx/org.yaml
     logo: ""
+
+  - id: logo-validation
+    input: examples/docx/sample-logo-validation.md
+    output: docs/build/docx/sample-logo-validation.docx
+    rewritten_markdown: docs/build/rewritten/sample-logo-validation.md
+    assets_dir: docs/build/diagrams/sample-logo-validation
+    org: examples/docx/org.yaml
+    logo: examples/docx/assets/acme-sample-logo.jpg

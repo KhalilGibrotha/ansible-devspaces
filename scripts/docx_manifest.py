@@ -180,6 +180,7 @@ def main() -> int:
         return 0
 
     if args.command == "render":
+        rendered_outputs: list[Path] = []
         for spec in specs:
             print(f"[render] {spec.id}")
             run_render(
@@ -188,6 +189,10 @@ def main() -> int:
                 toolkit_dir=args.toolkit_dir,
                 venv_dir=args.venv_dir,
             )
+            rendered_outputs.append(spec.output)
+        print("\nRendered DOCX files:")
+        for output in rendered_outputs:
+            print(output)
         return 0
 
     raise AssertionError(f"Unhandled command: {args.command}")
