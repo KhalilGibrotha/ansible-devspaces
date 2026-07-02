@@ -1,15 +1,14 @@
+defaults:
+  org: ../examples/docx/org.yaml
+  logo: ""
+
 documents:
   - id: sample-gallery
     input: examples/docx/sample-diagram-gallery.md
-    org: examples/docx/org.yaml
-    logo: ""
 
   - id: sample-mermaid
     input: examples/docx/sample-mermaid-architecture.md
-    org: examples/docx/org.yaml
-    logo: ""
 
   - id: logo-validation
     input: examples/docx/sample-logo-validation.md
-    org: examples/docx/org.yaml
     logo: examples/docx/assets/acme-sample-logo.jpg

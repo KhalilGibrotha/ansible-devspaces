@@ -27,6 +27,13 @@ class DocumentSpec:
     logo: Path | None
 
 
+@dataclass(frozen=True)
+class ManifestDefaults:
+    org: Path | None = None
+    logo: Path | None = None
+    output_root: Path | None = None
+
+
 def _resolve_path(raw_value: str | None) -> Path | None:
     if raw_value in (None, ""):
         return None
@@ -45,8 +52,13 @@ def _docx_filename(input_path: Path, output_name: str | None) -> str:
     return candidate
 
 
-def _default_output_paths(manifest_path: Path, input_path: Path, output_name: str | None) -> tuple[Path, Path, Path]:
-    build_root = manifest_path.parent / "build"
+def _default_output_paths(
+    manifest_path: Path,
+    input_path: Path,
+    output_name: str | None,
+    output_root: Path | None,
+) -> tuple[Path, Path, Path]:
+    build_root = output_root or (manifest_path.parent / "build")
     docx_name = _docx_filename(input_path, output_name)
     derived_stem = Path(docx_name).stem
     return (
@@ -63,7 +75,36 @@ def _resolve_manifest_path(raw_value: str, parent_manifest: Path) -> Path:
     return parent_manifest.parent / path
 
 
-def _load_manifest(path: Path, *, active_manifests: tuple[Path, ...]) -> list[DocumentSpec]:
+def _resolve_path_from_manifest(raw_value: str | None, manifest_path: Path) -> Path | None:
+    if raw_value in (None, ""):
+        return None
+    path = Path(raw_value)
+    if path.is_absolute():
+        return path
+    return manifest_path.parent / path
+
+
+def _merge_defaults(parent: ManifestDefaults, raw_defaults: object, manifest_path: Path) -> ManifestDefaults:
+    if raw_defaults is None:
+        return parent
+    if not isinstance(raw_defaults, dict):
+        raise ValueError(f"Manifest {manifest_path} field 'defaults' must be a mapping.")
+
+    org = parent.org
+    logo = parent.logo
+    output_root = parent.output_root
+
+    if "org" in raw_defaults:
+        org = _resolve_path_from_manifest(raw_defaults.get("org"), manifest_path)
+    if "logo" in raw_defaults:
+        logo = _resolve_path_from_manifest(raw_defaults.get("logo"), manifest_path)
+    if "output_root" in raw_defaults:
+        output_root = _resolve_path_from_manifest(raw_defaults.get("output_root"), manifest_path)
+
+    return ManifestDefaults(org=org, logo=logo, output_root=output_root)
+
+
+def _load_manifest(path: Path, *, active_manifests: tuple[Path, ...], inherited_defaults: ManifestDefaults) -> list[DocumentSpec]:
     if path in active_manifests:
         chain = " -> ".join(str(item) for item in (*active_manifests, path))
         raise ValueError(f"Manifest include cycle detected: {chain}")
@@ -74,6 +115,7 @@ def _load_manifest(path: Path, *, active_manifests: tuple[Path, ...]) -> list[Do
 
     documents = data.get("documents")
     includes = data.get("includes", [])
+    defaults = _merge_defaults(inherited_defaults, data.get("defaults"), path)
 
     if documents is None:
         documents = []
@@ -90,7 +132,13 @@ def _load_manifest(path: Path, *, active_manifests: tuple[Path, ...]) -> list[Do
     for index, raw_include in enumerate(includes, start=1):
         if not isinstance(raw_include, str) or not raw_include.strip():
             raise ValueError(f"Manifest include {index} in {path} must be a non-empty string.")
-        specs.extend(_load_manifest(_resolve_manifest_path(raw_include, path), active_manifests=nested_active))
+        specs.extend(
+            _load_manifest(
+                _resolve_manifest_path(raw_include, path),
+                active_manifests=nested_active,
+                inherited_defaults=defaults,
+            )
+        )
 
     for index, entry in enumerate(documents, start=1):
         if not isinstance(entry, dict):
@@ -106,6 +154,7 @@ def _load_manifest(path: Path, *, active_manifests: tuple[Path, ...]) -> list[Do
             path,
             input_path,
             entry.get("output_name"),
+            defaults.output_root,
         )
 
         specs.append(
@@ -115,8 +164,8 @@ def _load_manifest(path: Path, *, active_manifests: tuple[Path, ...]) -> list[Do
                 output=_resolve_path(entry.get("output")) or output_path,
                 rewritten_markdown=_resolve_path(entry.get("rewritten_markdown")) or rewritten_markdown_path,
                 assets_dir=_resolve_path(entry.get("assets_dir")) or assets_dir_path,
-                org=_resolve_path(entry.get("org")),
-                logo=_resolve_path(entry.get("logo")),
+                org=_resolve_path(entry.get("org")) or defaults.org,
+                logo=_resolve_path(entry.get("logo")) or defaults.logo,
             )
         )
 
@@ -130,7 +179,7 @@ def _load_manifest(path: Path, *, active_manifests: tuple[Path, ...]) -> list[Do
 
 
 def load_manifest(path: Path) -> list[DocumentSpec]:
-    return _load_manifest(path, active_manifests=())
+    return _load_manifest(path, active_manifests=(), inherited_defaults=ManifestDefaults())
 
 
 def select_documents(specs: list[DocumentSpec], *, document_id: str | None) -> list[DocumentSpec]:

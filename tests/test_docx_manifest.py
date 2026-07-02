@@ -8,11 +8,12 @@ from scripts.docx_manifest import load_manifest, select_documents
 class DocxManifestTests(unittest.TestCase):
     def test_load_manifest_parses_documents_with_defaults(self):
         manifest = """\
+defaults:
+  org: shared/org.yaml
+  logo: shared/logo.png
 documents:
   - id: architecture
     input: docs/publish/architecture.md
-    org: examples/docx/org.yaml
-    logo: ""
 """
 
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -27,6 +28,8 @@ documents:
             self.assertTrue(str(specs[0].output).endswith("build\\docx\\architecture.docx") or str(specs[0].output).endswith("build/docx/architecture.docx"))
             self.assertTrue(str(specs[0].rewritten_markdown).endswith("build\\rewritten\\architecture.md") or str(specs[0].rewritten_markdown).endswith("build/rewritten/architecture.md"))
             self.assertTrue(str(specs[0].assets_dir).endswith("build\\diagrams\\architecture") or str(specs[0].assets_dir).endswith("build/diagrams/architecture"))
+            self.assertTrue(str(specs[0].org).endswith("shared\\org.yaml") or str(specs[0].org).endswith("shared/org.yaml"))
+            self.assertTrue(str(specs[0].logo).endswith("shared\\logo.png") or str(specs[0].logo).endswith("shared/logo.png"))
 
     def test_select_documents_filters_by_id(self):
         manifest = """\
@@ -161,6 +164,61 @@ includes:
 
             with self.assertRaises(ValueError):
                 load_manifest(root_path)
+
+    def test_load_manifest_inherits_defaults_into_child_manifests(self):
+        root_manifest = """\
+defaults:
+  org: shared/org.yaml
+  logo: shared/logo.png
+  output_root: artifacts
+includes:
+  - manifests/child.yaml
+"""
+        child_manifest = """\
+documents:
+  - id: child-doc
+    input: docs/child.md
+"""
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            manifest_root = Path(tmpdir)
+            manifests_dir = manifest_root / "manifests"
+            manifests_dir.mkdir()
+            root_path = manifest_root / "render-manifest.yaml"
+            child_path = manifests_dir / "child.yaml"
+            root_path.write_text(root_manifest, encoding="utf-8")
+            child_path.write_text(child_manifest, encoding="utf-8")
+
+            specs = load_manifest(root_path)
+
+            self.assertEqual(["child-doc"], [spec.id for spec in specs])
+            self.assertTrue(str(specs[0].org).endswith("shared\\org.yaml") or str(specs[0].org).endswith("shared/org.yaml"))
+            self.assertTrue(str(specs[0].logo).endswith("shared\\logo.png") or str(specs[0].logo).endswith("shared/logo.png"))
+            self.assertTrue(str(specs[0].output).endswith("artifacts\\docx\\child.docx") or str(specs[0].output).endswith("artifacts/docx/child.docx"))
+
+    def test_document_fields_override_manifest_defaults(self):
+        manifest = """\
+defaults:
+  org: shared/org.yaml
+  logo: shared/logo.png
+  output_root: artifacts
+documents:
+  - id: architecture
+    input: docs/publish/architecture.md
+    org: overrides/custom-org.yaml
+    logo: overrides/custom-logo.jpg
+    output: exports/custom.docx
+"""
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            manifest_path = Path(tmpdir) / "manifest.yaml"
+            manifest_path.write_text(manifest, encoding="utf-8")
+
+            specs = load_manifest(manifest_path)
+
+            self.assertTrue(str(specs[0].org).endswith("overrides\\custom-org.yaml") or str(specs[0].org).endswith("overrides/custom-org.yaml"))
+            self.assertTrue(str(specs[0].logo).endswith("overrides\\custom-logo.jpg") or str(specs[0].logo).endswith("overrides/custom-logo.jpg"))
+            self.assertTrue(str(specs[0].output).endswith("exports\\custom.docx") or str(specs[0].output).endswith("exports/custom.docx"))
 
 
 if __name__ == "__main__":

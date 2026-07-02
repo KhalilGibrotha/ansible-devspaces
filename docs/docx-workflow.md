@@ -104,6 +104,11 @@ settings.
 Example:
 
 ```yaml
+defaults:
+  org: vars/org.yaml
+  logo: assets/logo/logo.png
+  output_root: docs/build
+
 includes:
   - manifests/networking.yaml
   - manifests/platform.yaml
@@ -111,14 +116,10 @@ includes:
 documents:
   - id: architecture
     input: docs/publish/architecture.md
-    org: examples/docx/org.yaml
-    logo: ""
 
   - id: onboarding
     input: docs/publish/onboarding.md
     output_name: onboarding-guide
-    org: examples/docx/org.yaml
-    logo: ""
 ```
 
 Why a manifest is preferable:
@@ -131,15 +132,20 @@ Why a manifest is preferable:
 Current default path behavior:
 
 - `id` and `input` are the only required fields
+- `defaults` can define shared `org`, `logo`, and `output_root` values
 - `includes` can pull in child manifests relative to the current manifest file
+- if `output_root` is omitted, generated files default under
+  `MANIFEST_DIR/build/`
 - if `output` is omitted, DOCX output defaults to
-  `MANIFEST_DIR/build/docx/<name>.docx`
+  `<output_root>/docx/<name>.docx`
 - if `rewritten_markdown` is omitted, it defaults to
-  `MANIFEST_DIR/build/rewritten/<name>.md`
+  `<output_root>/rewritten/<name>.md`
 - if `assets_dir` is omitted, it defaults to
-  `MANIFEST_DIR/build/diagrams/<name>/`
+  `<output_root>/diagrams/<name>/`
 - `output_name` can override `<name>` when the DOCX filename should differ from
   the source Markdown basename
+- document-level `org`, `logo`, `output`, `rewritten_markdown`, and `assets_dir`
+  override inherited defaults
 - duplicate `id` values across the combined manifest tree are rejected
 - include cycles are rejected
 
