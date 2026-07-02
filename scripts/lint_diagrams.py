@@ -47,8 +47,8 @@ def iter_diagram_blocks(file_path: Path) -> list[DiagramBlock]:
     return blocks
 
 
-def validate_diagram(block: DiagramBlock, kroki_url: str) -> None:
-    endpoint = f"{kroki_url.rstrip('/')}/{block.kroki_type}/svg"
+def validate_diagram(block: DiagramBlock, kroki_url: str, output_format: str) -> None:
+    endpoint = f"{kroki_url.rstrip('/')}/{block.kroki_type}/{output_format}"
     request = urllib.request.Request(
         endpoint,
         data=block.source.encode("utf-8"),
@@ -82,6 +82,12 @@ def parse_args() -> argparse.Namespace:
         help="Markdown files or directories to scan. Defaults to examples/docx.",
     )
     parser.add_argument("--kroki-url", default="http://127.0.0.1:8000")
+    parser.add_argument(
+        "--format",
+        default="png",
+        choices=("png", "svg"),
+        help="Kroki output format to validate. Use png to match DOCX rendering.",
+    )
     return parser.parse_args()
 
 
@@ -112,7 +118,7 @@ def main() -> int:
     failures: list[str] = []
     for block in blocks:
         try:
-            validate_diagram(block, args.kroki_url)
+            validate_diagram(block, args.kroki_url, args.format)
             print(f"OK  {block.file_path}:{block.line_number} [{block.language}]")
         except RuntimeError as exc:
             failures.append(str(exc))
@@ -122,7 +128,7 @@ def main() -> int:
         print(f"\n{len(failures)} diagram validation failure(s).", file=sys.stderr)
         return 1
 
-    print(f"\nValidated {len(blocks)} diagram block(s) via Kroki.")
+    print(f"\nValidated {len(blocks)} diagram block(s) via Kroki ({args.format}).")
     return 0
 
 
