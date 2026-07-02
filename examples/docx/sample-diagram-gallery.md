@@ -2,7 +2,7 @@
 title: "Kroki Diagram Gallery Render Test"
 department: "Platform Engineering"
 status: "Draft"
-version: "0.5"
+version: "0.6"
 date: "2026-07-01"
 author: "Alex Gambino"
 owner: "Platform Architecture"
@@ -10,10 +10,10 @@ audience:
   - Platform Engineering
   - Architecture Review Board
 revision_history:
-  - version: "0.5"
+  - version: "0.6"
     date: "2026-07-01"
     author: "Alex Gambino"
-    description: "Expanded sample to cover multiple Kroki-supported diagram languages with PNG-friendly examples"
+    description: "Expanded sample to cover multiple Kroki-supported diagram languages with stable PNG-friendly examples"
 ---
 
 ## Overview
@@ -96,22 +96,32 @@ digraph G {
 }
 ```
 
-## SvgBob
+## Packetdiag
 
 Source:
 
 ```text
-+--------+    +--------+    +------+
-| Author |--->| Kroki  |--->| DOCX |
-+--------+    +--------+    +------+
+packetdiag {
+  colwidth = 28;
+  node_height = 72;
+  internet [label = "Client"];
+  gateway [label = "Kroki"];
+  docx [label = "DOCX"];
+  internet -> gateway -> docx;
+}
 ```
 
 Rendered:
 
-```svgbob
-+--------+    +--------+    +------+
-| Author |--->| Kroki  |--->| DOCX |
-+--------+    +--------+    +------+
+```packetdiag
+packetdiag {
+  colwidth = 28;
+  node_height = 72;
+  internet [label = "Client"];
+  gateway [label = "Kroki"];
+  docx [label = "DOCX"];
+  internet -> gateway -> docx;
+}
 ```
 
 ## Seqdiag
