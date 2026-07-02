@@ -48,6 +48,8 @@ Source:
 
 ```text
 @startuml
+skinparam dpi 200
+skinparam defaultFontSize 18
 actor User
 participant Portal
 database Repo
@@ -62,6 +64,8 @@ Rendered:
 
 ```plantuml
 @startuml
+skinparam dpi 200
+skinparam defaultFontSize 18
 actor User
 participant Portal
 database Repo
@@ -102,6 +106,8 @@ Source:
 
 ```text
 @startuml
+skinparam dpi 200
+skinparam defaultFontSize 18
 !include <C4/C4_Container>
 
 Person(author, "Author")
@@ -119,6 +125,8 @@ Rendered:
 
 ```c4plantuml
 @startuml
+skinparam dpi 200
+skinparam defaultFontSize 18
 !include <C4/C4_Container>
 
 Person(author, "Author")
