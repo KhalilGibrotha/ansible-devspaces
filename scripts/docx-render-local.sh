@@ -51,6 +51,9 @@ source "$VENV_DIR/bin/activate"
 python -m pip install --upgrade pip >/dev/null
 python -m pip install --no-cache-dir -e "$TOOLKIT_DIR/docx_builder"
 
+echo "Running static preflight checks for $INPUT_MARKDOWN"
+python "$REPO_ROOT/scripts/preflight_docx.py" "$INPUT_MARKDOWN"
+
 echo "Validating diagram fences in $INPUT_MARKDOWN"
 python "$REPO_ROOT/scripts/lint_diagrams.py" --kroki-url "$KROKI_URL" "$INPUT_MARKDOWN"
 

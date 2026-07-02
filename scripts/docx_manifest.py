@@ -80,6 +80,13 @@ def select_documents(specs: list[DocumentSpec], *, document_id: str | None) -> l
 
 
 def run_lint(spec: DocumentSpec, *, kroki_url: str, output_format: str) -> None:
+    preflight_cmd = [
+        sys.executable,
+        str(REPO_ROOT / "scripts" / "preflight_docx.py"),
+        str(spec.input),
+    ]
+    subprocess.run(preflight_cmd, check=True)
+
     cmd = [
         sys.executable,
         str(REPO_ROOT / "scripts" / "lint_diagrams.py"),
@@ -126,6 +133,9 @@ def parse_args() -> argparse.Namespace:
     list_parser = subparsers.add_parser("list", help="List documents from the manifest.")
     add_common_args(list_parser)
 
+    preflight_parser = subparsers.add_parser("preflight", help="Run static preflight checks for manifest-managed documents.")
+    add_common_args(preflight_parser)
+
     lint_parser = subparsers.add_parser("lint", help="Lint manifest-managed documents.")
     add_common_args(lint_parser)
     lint_parser.add_argument("--kroki-url", default="http://127.0.0.1:8000")
@@ -148,6 +158,19 @@ def main() -> int:
     if args.command == "list":
         for spec in specs:
             print(f"{spec.id}: {spec.input} -> {spec.output}")
+        return 0
+
+    if args.command == "preflight":
+        for spec in specs:
+            print(f"[preflight] {spec.id}")
+            subprocess.run(
+                [
+                    sys.executable,
+                    str(REPO_ROOT / "scripts" / "preflight_docx.py"),
+                    str(spec.input),
+                ],
+                check=True,
+            )
         return 0
 
     if args.command == "lint":

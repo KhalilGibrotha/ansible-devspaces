@@ -1,5 +1,6 @@
 ---
 title: "Kroki Diagram Gallery Render Test"
+doc_type: "test"
 department: "Platform Engineering"
 status: "Draft"
 version: "0.7"

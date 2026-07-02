@@ -40,6 +40,8 @@ specifications.
   a local Kroki sidecar is reachable from the main Dev Spaces container.
 - **Diagram lint step** (`scripts/lint_diagrams.py`) for validating Markdown
   diagram fences through Kroki before attempting a full DOCX render.
+- **Static preflight step** (`scripts/preflight_docx.py`) for catching
+  front-matter and source-text issues before diagram or DOCX processing.
 - **Local DOCX render wrapper** (`scripts/docx-render-local.sh`) for generating
   DOCX output inside the workspace using the Kroki sidecar and a local Python
   virtual environment.
@@ -78,12 +80,14 @@ specifications.
 7. **Validate document diagrams before rendering**: run the `Validate Markdown
    diagrams` command from the Dev Spaces UI or `make diagram-lint` from the
    terminal to catch unsupported or invalid diagram blocks early.
-8. **Validate manifest-managed documents**: run the `Validate manifest-managed
+8. **Run static preflight checks**: run `make docx-preflight` for a single
+   document or `make docx-preflight-all` for the manifest-managed document set.
+9. **Validate manifest-managed documents**: run the `Validate manifest-managed
    docs` command from the Dev Spaces UI or `make diagram-lint-all` from the
    terminal to lint every document listed in the default manifest.
-9. **Render sample DOCX locally**: run the `Render sample DOCX locally` command
+10. **Render sample DOCX locally**: run the `Render sample DOCX locally` command
    from the Dev Spaces UI or `make docx-render-local` from the terminal.
-10. **Render manifest-managed documents**: run the `Render manifest-managed DOCX
+11. **Render manifest-managed documents**: run the `Render manifest-managed DOCX
     docs` command from the Dev Spaces UI or `make docx-render-all` from the
     terminal.
 
@@ -184,6 +188,7 @@ For documentation work, validate diagram fences before committing or building a
 DOCX:
 
 ```bash
+make docx-preflight
 make diagram-lint
 ```
 
@@ -205,6 +210,7 @@ The default manifest path is `examples/docx/render-manifest.example.yaml`.
 Manifest-oriented commands:
 
 ```bash
+make docx-preflight-all
 make diagram-lint-all
 make docx-render-all
 make docx-render-one DOC_ID=sample-gallery

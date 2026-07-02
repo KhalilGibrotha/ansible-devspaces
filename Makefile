@@ -1,10 +1,11 @@
-.PHONY: bootstrap lint syntax-check diagram-lint diagram-lint-all docx-render-all docx-render-one test smoke docx-renderer-test kroki-sidecar-test docx-render-local docx-render-local-sample print-kroki-manifest print-docx-job clean-workspace
+.PHONY: bootstrap lint syntax-check docx-preflight docx-preflight-all diagram-lint diagram-lint-all docx-render-all docx-render-one test smoke docx-renderer-test kroki-sidecar-test docx-render-local docx-render-local-sample print-kroki-manifest print-docx-job clean-workspace
 
 ANSIBLE_PLAYBOOK ?= ansible-playbook
 ANSIBLE_LINT ?= ansible-lint
 PYTHON ?= python3
 MANIFEST ?= docs/render-manifest.yaml
 DOC_ID ?=
+DOC_PATH ?= examples/docx/sample-diagram-gallery.md
 
 bootstrap:
 	bash ./scripts/devspace-bootstrap.sh
@@ -14,6 +15,12 @@ lint:
 
 syntax-check:
 	$(ANSIBLE_PLAYBOOK) --syntax-check -i inventories/hosts.ini playbooks/site.yml
+
+docx-preflight:
+	$(PYTHON) ./scripts/preflight_docx.py "$(DOC_PATH)"
+
+docx-preflight-all:
+	$(PYTHON) ./scripts/docx_manifest.py preflight --manifest "$(MANIFEST)"
 
 diagram-lint:
 	$(PYTHON) ./scripts/lint_diagrams.py
