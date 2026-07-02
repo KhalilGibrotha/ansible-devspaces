@@ -185,12 +185,12 @@ Suggested meanings:
 The current implementation uses:
 
 ```text
-MANIFEST ?= examples/docx/render-manifest.example.yaml
+MANIFEST ?= docs/render-manifest.yaml
 make docx-render-one DOC_ID=sample-gallery
 ```
 
-The eventual intent is to preserve this shape while allowing a repository-local
-non-example manifest to become the default.
+The sample reference manifest remains at
+`examples/docx/render-manifest.example.yaml` for comparison and experimentation.
 
 ## CI / DaC Flow
 

@@ -258,7 +258,8 @@ Kroki-supported languages:
 - `blockdiag`
 
 A manifest-oriented next-step design is documented in
-`docs/docx-workflow.md`. There is also a sample manifest at
+`docs/docx-workflow.md`. The current default manifest is
+`docs/render-manifest.yaml`, and a sample reference manifest remains at
 `examples/docx/render-manifest.example.yaml`.
 
 ## Experimental Mermaid-to-DOCX Rendering

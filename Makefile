@@ -3,7 +3,7 @@
 ANSIBLE_PLAYBOOK ?= ansible-playbook
 ANSIBLE_LINT ?= ansible-lint
 PYTHON ?= python3
-MANIFEST ?= examples/docx/render-manifest.example.yaml
+MANIFEST ?= docs/render-manifest.yaml
 DOC_ID ?=
 
 bootstrap:
