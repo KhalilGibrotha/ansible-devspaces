@@ -224,6 +224,8 @@ Current behavior:
   `<DOCX_WORK_ROOT>/<repo-name>/...`
 - the bootstrap script prepares `/projects/.docx-work` by default in a typical
   Dev Spaces layout
+- the default `workspace.code-workspace` includes `../.docx-work` so generated
+  DOCX output is visible in the IDE explorer without extra setup
 - outputs that already point outside the repo tree are left unchanged
 
 Example:

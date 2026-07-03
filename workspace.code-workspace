@@ -25,6 +25,10 @@
       "path": "workspace-repos"
     },
     {
+      "name": "docx-work",
+      "path": "../.docx-work"
+    },
+    {
       "name": "dac-toolkit",
       "path": "workspace-repos/dac-toolkit"
     }
