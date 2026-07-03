@@ -66,7 +66,9 @@ specifications.
    `Bootstrap workspace dependencies` command from the Dev Spaces UI, or run
    `bash ./scripts/devspace-bootstrap.sh` from the terminal to fetch upstream
    content and dependencies. Cloned repos will appear in the visible
-   `workspace-repos/` folder.
+   `workspace-repos/` folder. Generated DOCX output will appear in the visible
+   `docx-work` workspace root after the workspace is reloaded on the current
+   branch.
 4. **Run the smoke test**: execute the `Run sample site playbook` command or
    run `ansible-playbook playbooks/site.yml` manually. The playbook installs
    developer tooling, surfaces the injected domain credentials, and writes
@@ -231,6 +233,14 @@ diagram-heavy Markdown:
 The best all-around preview path for this repo is `Markdown Preview Enhanced`,
 because it handles Markdown-centric authoring with embedded Mermaid, PlantUML,
 and Graphviz blocks in one UI.
+
+The default multi-root workspace is intentionally minimal. The expected top-level
+Explorer roots are:
+
+- `ansible-devspaces`
+- `workspace-repos`
+- `docx-work`
+- `dac-toolkit`
 
 ## Local Mermaid-to-DOCX Flow
 
