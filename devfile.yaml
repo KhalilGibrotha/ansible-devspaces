@@ -174,7 +174,5 @@ commands:
       commandLine: /bin/bash
       hotReloadCapable: true
 events:
-  preStart:
-    - prepare-workspace-roots
   postStart:
     - workspace-post-start
