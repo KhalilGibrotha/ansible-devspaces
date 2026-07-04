@@ -12,4 +12,4 @@ documents:
 
   - id: logo-validation
     input: examples/docx/sample-logo-validation.md
-    logo: examples/docx/assets/acme-sample-logo.jpg
+    logo: examples/docx/assets/acme-sample-logo.png
