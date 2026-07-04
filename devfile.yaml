@@ -67,106 +67,106 @@ commands:
       label: Prepare workspace roots
       component: ansible-tools
       commandLine: bash ./scripts/devspace-prepare-workspace.sh
-    workingDir: /projects/ansible-devspaces
-    group:
-      kind: build
+      workingDir: /projects/ansible-devspaces
+      group:
+        kind: build
   - id: install-galaxy-deps
     exec:
       label: Install Ansible Galaxy dependencies
       component: ansible-tools
       commandLine: ansible-galaxy install -r requirements.yml --force
-    workingDir: /projects/ansible-devspaces
-    group:
-      kind: build
-      isDefault: true
+      workingDir: /projects/ansible-devspaces
+      group:
+        kind: build
+        isDefault: true
   - id: sync-upstream-repos
     exec:
       label: Synchronize upstream repositories
       component: ansible-tools
       commandLine: bash ./scripts/clone-repos.sh
-    workingDir: /projects/ansible-devspaces
-    group:
-      kind: build
+      workingDir: /projects/ansible-devspaces
+      group:
+        kind: build
   - id: bootstrap-workspace
     exec:
       label: Bootstrap workspace dependencies
       component: ansible-tools
       commandLine: bash ./scripts/devspace-bootstrap.sh
-    workingDir: /projects/ansible-devspaces
-    group:
-      kind: build
-      isDefault: true
+      workingDir: /projects/ansible-devspaces
+      group:
+        kind: build
+        isDefault: true
   - id: workspace-post-start
     exec:
       label: Automatic workspace startup bootstrap
       component: ansible-tools
       commandLine: bash ./scripts/devspace-post-start.sh
-    workingDir: /projects/ansible-devspaces
+      workingDir: /projects/ansible-devspaces
   - id: verify-kroki-sidecar
     exec:
       label: Verify Kroki sidecar
       component: ansible-tools
       commandLine: python3 ./scripts/verify-kroki.py
-    workingDir: /projects/ansible-devspaces
-    group:
-      kind: test
+      workingDir: /projects/ansible-devspaces
+      group:
+        kind: test
   - id: validate-doc-diagrams
     exec:
       label: Validate Markdown diagrams
       component: ansible-tools
       commandLine: make diagram-lint
-    workingDir: /projects/ansible-devspaces
-    group:
-      kind: test
+      workingDir: /projects/ansible-devspaces
+      group:
+        kind: test
   - id: validate-manifest-documents
     exec:
       label: Validate manifest-managed docs
       component: ansible-tools
       commandLine: make diagram-lint-all
-    workingDir: /projects/ansible-devspaces
-    group:
-      kind: test
+      workingDir: /projects/ansible-devspaces
+      group:
+        kind: test
   - id: render-sample-docx-local
     exec:
       label: Render sample DOCX locally
       component: ansible-tools
       commandLine: bash ./scripts/docx-render-local.sh
-    workingDir: /projects/ansible-devspaces
-    group:
-      kind: run
+      workingDir: /projects/ansible-devspaces
+      group:
+        kind: run
   - id: render-manifest-documents
     exec:
       label: Render manifest-managed DOCX docs
       component: ansible-tools
       commandLine: make docx-render-all
-    workingDir: /projects/ansible-devspaces
-    group:
-      kind: run
+      workingDir: /projects/ansible-devspaces
+      group:
+        kind: run
   - id: run-sample-playbook
     exec:
       label: Run sample site playbook
       component: ansible-tools
       commandLine: ansible-playbook playbooks/site.yml
-    workingDir: /projects/ansible-devspaces
-    group:
-      kind: run
-      isDefault: true
+      workingDir: /projects/ansible-devspaces
+      group:
+        kind: run
+        isDefault: true
   - id: run-ansible-lint
     exec:
       label: Run Ansible lint checks
       component: ansible-tools
       commandLine: make lint
-    workingDir: /projects/ansible-devspaces
-    group:
-      kind: test
+      workingDir: /projects/ansible-devspaces
+      group:
+        kind: test
   - id: run-test-suite
     exec:
       label: Run test suite
       component: ansible-tools
       commandLine: make test
-    workingDir: /projects/ansible-devspaces
-    group:
-      kind: test
+      workingDir: /projects/ansible-devspaces
+      group:
+        kind: test
   - id: open-shell
     exec:
       label: Open interactive shell
