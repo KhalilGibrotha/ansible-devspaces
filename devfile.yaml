@@ -20,6 +20,28 @@ components:
       cpuRequest: 500m
       memoryRequest: 1Gi
       mountSources: true
+      command:
+        - /bin/bash
+      args:
+        - -lc
+        - |
+          BOOTSTRAP_LOG=/tmp/devspace-bootstrap.log
+          PROJECT_ROOT=/projects/ansible-devspaces
+          BOOTSTRAP_SCRIPT="$PROJECT_ROOT/scripts/devspace-container-start.sh"
+          (
+            : > "$BOOTSTRAP_LOG"
+            echo "[container-start] Waiting for $BOOTSTRAP_SCRIPT" >>"$BOOTSTRAP_LOG"
+            for _ in $(seq 1 60); do
+              if [ -f "$BOOTSTRAP_SCRIPT" ]; then
+                echo "[container-start] Launching bootstrap wrapper" >>"$BOOTSTRAP_LOG"
+                bash "$BOOTSTRAP_SCRIPT" >>"$BOOTSTRAP_LOG" 2>&1
+                exit 0
+              fi
+              sleep 2
+            done
+            echo "[container-start] Bootstrap wrapper not found; skipping automatic bootstrap." >>"$BOOTSTRAP_LOG"
+          ) &
+          exec /entrypoint.sh
       env:
         - name: ANSIBLE_CONFIG
           value: /projects/ansible-devspaces/ansible.cfg
@@ -96,12 +118,6 @@ commands:
       group:
         kind: build
         isDefault: true
-  - id: workspace-post-start
-    exec:
-      label: Automatic workspace startup bootstrap
-      component: ansible-tools
-      commandLine: bash ./scripts/devspace-post-start.sh
-      workingDir: /projects/ansible-devspaces
   - id: verify-kroki-sidecar
     exec:
       label: Verify Kroki sidecar
@@ -173,6 +189,3 @@ commands:
       component: ansible-tools
       commandLine: /bin/bash
       hotReloadCapable: true
-events:
-  postStart:
-    - workspace-post-start

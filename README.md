@@ -19,9 +19,10 @@ specifications.
 - **Bootstrap automation** (`scripts/clone-repos.sh` + `repos-to-clone.txt`)
   that materializes upstream Ansible dependencies inside `workspace-repos/` on every
   launch.
-- **Automatic startup bootstrap** (`scripts/devspace-prepare-workspace.sh` and
-  `scripts/devspace-post-start.sh`) that prepares workspace roots before the IDE
-  opens, then syncs repos and Galaxy dependencies after startup.
+- **Automatic startup bootstrap** (`scripts/devspace-container-start.sh`,
+  `scripts/devspace-prepare-workspace.sh`, and `scripts/devspace-post-start.sh`)
+  that waits for the source mount, then prepares workspace roots and syncs repo
+  dependencies automatically as part of container startup.
 - **Bootstrap wrapper** (`scripts/devspace-bootstrap.sh`) that reruns the same
   setup explicitly when you need to recover or refresh the workspace.
 - **Project configuration** (`ansible.cfg`, `group_vars/`, `inventories/`)
@@ -65,9 +66,10 @@ specifications.
    `ghcr.io/ansible/ansible-devspaces` workspace image used by the upstream
    Red Hat demo, and applies the secret-backed environment variables
    automatically.
-3. **Wait for automatic bootstrap to finish**: the Devfile now prepares
-   `workspace-repos/` and `docx-work/` during startup, then runs the tolerant
-   post-start sync automatically. Cloned repos appear in the visible
+3. **Wait for automatic bootstrap to finish**: the Devfile now launches a
+   container-start wrapper that waits for `/projects/ansible-devspaces` to be
+   mounted, then prepares `workspace-repos/` and `docx-work/` and runs the
+   tolerant bootstrap automatically. Cloned repos appear in the visible
    `workspace-repos/` root and generated DOCX output appears in the visible
    `docx-work` root without requiring a manual bootstrap command.
 4. **Manual recovery bootstrap if needed**: if the startup sync was interrupted
@@ -102,6 +104,13 @@ If the automatic startup sync does not finish cleanly, rerun bootstrap manually:
 
 ```bash
 bash ./scripts/devspace-bootstrap.sh
+```
+
+The automatic bootstrap writes its log to `/tmp/devspace-bootstrap.log`. If the
+workspace comes up without the expected repo roots, inspect that file first:
+
+```bash
+cat /tmp/devspace-bootstrap.log
 ```
 
 If you prefer to launch the workspace locally, run the same bootstrap steps
