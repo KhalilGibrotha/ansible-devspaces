@@ -19,8 +19,11 @@ specifications.
 - **Bootstrap automation** (`scripts/clone-repos.sh` + `repos-to-clone.txt`)
   that materializes upstream Ansible dependencies inside `workspace-repos/` on every
   launch.
-- **Bootstrap wrapper** (`scripts/devspace-bootstrap.sh`) that runs clone and
-  Galaxy dependency install as one explicit post-start action.
+- **Automatic startup bootstrap** (`scripts/devspace-prepare-workspace.sh` and
+  `scripts/devspace-post-start.sh`) that prepares workspace roots before the IDE
+  opens, then syncs repos and Galaxy dependencies after startup.
+- **Bootstrap wrapper** (`scripts/devspace-bootstrap.sh`) that reruns the same
+  setup explicitly when you need to recover or refresh the workspace.
 - **Project configuration** (`ansible.cfg`, `group_vars/`, `inventories/`)
   tuned for local execution against the Dev Spaces container.
 - **Sample playbook** (`playbooks/site.yml`) that demonstrates how to reference
@@ -62,38 +65,40 @@ specifications.
    `ghcr.io/ansible/ansible-devspaces` workspace image used by the upstream
    Red Hat demo, and applies the secret-backed environment variables
    automatically.
-3. **Manual bootstrap after workspace start**: once the IDE opens, run the
-   `Bootstrap workspace dependencies` command from the Dev Spaces UI, or run
-   `bash ./scripts/devspace-bootstrap.sh` from the terminal to fetch upstream
-   content and dependencies. Cloned repos will appear in the visible
-   `workspace-repos/` folder. Generated DOCX output will appear in the visible
-   `docx-work` workspace root after the workspace is reloaded on the current
-   branch.
-4. **Run the smoke test**: execute the `Run sample site playbook` command or
+3. **Wait for automatic bootstrap to finish**: the Devfile now prepares
+   `workspace-repos/` and `docx-work/` during startup, then runs the tolerant
+   post-start sync automatically. Cloned repos appear in the visible
+   `workspace-repos/` root and generated DOCX output appears in the visible
+   `docx-work` root without requiring a manual bootstrap command.
+4. **Manual recovery bootstrap if needed**: if the startup sync was interrupted
+   or you want to force a refresh, run the `Bootstrap workspace dependencies`
+   command from the Dev Spaces UI or `bash ./scripts/devspace-bootstrap.sh`
+   from the terminal.
+5. **Run the smoke test**: execute the `Run sample site playbook` command or
    run `ansible-playbook playbooks/site.yml` manually. The playbook installs
    developer tooling, surfaces the injected domain credentials, and writes
    `.workspace/domain_credentials.yml` for reuse.
-5. **Iterate with fast feedback**: leverage the built-in commands or call the
+6. **Iterate with fast feedback**: leverage the built-in commands or call the
    Makefile targets directly (`make lint`, `make test`, `make smoke`) to
    validate changes as you work.
-6. **Verify Kroki sidecar**: run the `Verify Kroki sidecar` command from the
+7. **Verify Kroki sidecar**: run the `Verify Kroki sidecar` command from the
    Dev Spaces UI or `make kroki-sidecar-test` from the terminal to confirm the
    sidecar responds to `/health` and can render a sample Mermaid diagram.
-7. **Validate document diagrams before rendering**: run the `Validate Markdown
+8. **Validate document diagrams before rendering**: run the `Validate Markdown
    diagrams` command from the Dev Spaces UI or `make diagram-lint` from the
    terminal to catch unsupported or invalid diagram blocks early.
-8. **Run static preflight checks**: run `make docx-preflight` for a single
+9. **Run static preflight checks**: run `make docx-preflight` for a single
    document or `make docx-preflight-all` for the manifest-managed document set.
-9. **Validate manifest-managed documents**: run the `Validate manifest-managed
+10. **Validate manifest-managed documents**: run the `Validate manifest-managed
    docs` command from the Dev Spaces UI or `make diagram-lint-all` from the
    terminal to lint every document listed in the default manifest.
-10. **Render sample DOCX locally**: run the `Render sample DOCX locally` command
+11. **Render sample DOCX locally**: run the `Render sample DOCX locally` command
    from the Dev Spaces UI or `make docx-render-local` from the terminal.
-11. **Render manifest-managed documents**: run the `Render manifest-managed DOCX
+12. **Render manifest-managed documents**: run the `Render manifest-managed DOCX
     docs` command from the Dev Spaces UI or `make docx-render-all` from the
     terminal.
 
-After the workspace opens, run bootstrap manually:
+If the automatic startup sync does not finish cleanly, rerun bootstrap manually:
 
 ```bash
 bash ./scripts/devspace-bootstrap.sh
@@ -245,7 +250,8 @@ Explorer roots are:
 ## Local Mermaid-to-DOCX Flow
 
 The primary Mermaid render path is now workspace-local rather than Kubernetes
-Job-based. After running bootstrap, the local wrapper will:
+Job-based. After automatic startup bootstrap or a manual bootstrap rerun, the
+local wrapper will:
 
 1. create or reuse a Python virtual environment
 2. clone `dac-toolkit` into `workspace-repos/` automatically if it is missing

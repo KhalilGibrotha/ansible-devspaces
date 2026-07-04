@@ -22,6 +22,7 @@ run_step() {
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 cd "$SCRIPT_DIR/.."
 
+run_step "Prepare workspace roots" ./scripts/devspace-prepare-workspace.sh
 run_step "Clone upstream repositories" ./scripts/clone-repos.sh
 run_step "Install Galaxy dependencies" ansible-galaxy install -r requirements.yml --force
 

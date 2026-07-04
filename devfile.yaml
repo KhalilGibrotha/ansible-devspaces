@@ -10,7 +10,7 @@ projects:
       remotes:
         origin: "https://github.com/KhalilGibrotha/ansible-devspaces"
       checkoutFrom:
-        revision: "experiment/kroki-docx-mermaid-rendering"
+        revision: "codex/devspace-docx-next-iteration"
 components:
   - name: ansible-tools
     container:
@@ -62,6 +62,14 @@ components:
     volume:
       size: 1Gi
 commands:
+  - id: prepare-workspace-roots
+    exec:
+      label: Prepare workspace roots
+      component: ansible-tools
+      workingDir: /projects/ansible-devspaces
+      commandLine: bash ./scripts/devspace-prepare-workspace.sh
+      group:
+        kind: build
   - id: install-galaxy-deps
     exec:
       label: Install Ansible Galaxy dependencies
@@ -88,6 +96,12 @@ commands:
       group:
         kind: build
         isDefault: true
+  - id: workspace-post-start
+    exec:
+      label: Automatic workspace startup bootstrap
+      component: ansible-tools
+      workingDir: /projects/ansible-devspaces
+      commandLine: bash ./scripts/devspace-post-start.sh
   - id: verify-kroki-sidecar
     exec:
       label: Verify Kroki sidecar
@@ -159,3 +173,8 @@ commands:
       component: ansible-tools
       commandLine: /bin/bash
       hotReloadCapable: true
+events:
+  preStart:
+    - prepare-workspace-roots
+  postStart:
+    - workspace-post-start
