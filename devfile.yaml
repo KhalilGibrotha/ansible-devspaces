@@ -4,13 +4,6 @@ metadata:
   description: Development environment for Ansible playbooks and roles.
 attributes:
   controller.devfile.io/storage-type: ephemeral
-projects:
-  - name: ansible-devspaces
-    git:
-      remotes:
-        origin: "https://github.com/KhalilGibrotha/ansible-devspaces"
-      checkoutFrom:
-        revision: "experiment/kroki-docx-mermaid-rendering"
 components:
   - name: ansible-tools
     container:
