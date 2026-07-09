@@ -17,7 +17,9 @@ if str(REPO_ROOT) not in sys.path:
 from experiments.docx_renderer.render_with_kroki import (
     FENCE_RE,
     SUPPORTED_DIAGRAM_TYPES,
+    build_render_endpoint,
     ensure_png_bytes,
+    get_render_scale,
 )
 
 
@@ -52,7 +54,12 @@ def iter_diagram_blocks(file_path: Path) -> list[DiagramBlock]:
 
 
 def validate_diagram(block: DiagramBlock, kroki_url: str, output_format: str) -> None:
-    endpoint = f"{kroki_url.rstrip('/')}/{block.kroki_type}/{output_format}"
+    endpoint = build_render_endpoint(
+        kroki_url,
+        block.kroki_type,
+        output_format,
+        scale=get_render_scale(),
+    )
     request = urllib.request.Request(
         endpoint,
         data=block.source.encode("utf-8"),

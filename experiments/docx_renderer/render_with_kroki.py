@@ -7,6 +7,7 @@ import argparse
 import os
 import re
 import urllib.error
+import urllib.parse
 import urllib.request
 from pathlib import Path
 from typing import Callable
@@ -43,10 +44,53 @@ SUPPORTED_DIAGRAM_TYPES = {
 
 FENCE_RE = re.compile(r"```([A-Za-z0-9_-]+)[^\n]*\n(.*?)\n```", re.DOTALL)
 PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
+KROKI_RENDER_SCALE_DEFAULT = 2.0
+KROKI_RENDER_SCALE_MIN = 1.0
+KROKI_RENDER_SCALE_MAX = 4.0
 
 
 class DiagramRenderError(RuntimeError):
     """Raised when Kroki rejects a specific diagram block."""
+
+
+def get_render_scale() -> float:
+    """Return a bounded Kroki render scale from environment variables."""
+    raw = ""
+    for name in ("DOCX_BUILDER_DIAGRAM_RENDER_SCALE", "KROKI_RENDER_SCALE"):
+        value = os.environ.get(name)
+        if value is not None and value.strip():
+            raw = value.strip()
+            break
+    if not raw:
+        raw = str(KROKI_RENDER_SCALE_DEFAULT)
+    try:
+        scale = float(raw)
+    except ValueError:
+        return KROKI_RENDER_SCALE_DEFAULT
+    if scale < KROKI_RENDER_SCALE_MIN:
+        return KROKI_RENDER_SCALE_MIN
+    if scale > KROKI_RENDER_SCALE_MAX:
+        return KROKI_RENDER_SCALE_MAX
+    return scale
+
+
+def format_scale(scale: float) -> str:
+    """Serialize scale values cleanly for query strings."""
+    if float(scale).is_integer():
+        return str(int(scale))
+    return str(scale)
+
+
+def build_render_endpoint(
+    kroki_url: str,
+    diagram_type: str,
+    output_format: str,
+    *,
+    scale: float,
+) -> str:
+    """Build a Kroki render endpoint with the configured scale."""
+    params = urllib.parse.urlencode({"scale": format_scale(scale)})
+    return f"{kroki_url.rstrip('/')}/{diagram_type}/{output_format}?{params}"
 
 
 def ensure_png_bytes(payload: bytes, *, diagram_type: str, endpoint: str) -> bytes:
@@ -62,7 +106,12 @@ def ensure_png_bytes(payload: bytes, *, diagram_type: str, endpoint: str) -> byt
 
 def render_diagram_png(diagram_type: str, diagram_source: str, kroki_url: str) -> bytes:
     """Render a Kroki-supported diagram to PNG bytes."""
-    endpoint = f"{kroki_url.rstrip('/')}/{diagram_type}/png"
+    endpoint = build_render_endpoint(
+        kroki_url,
+        diagram_type,
+        "png",
+        scale=get_render_scale(),
+    )
     request = urllib.request.Request(
         endpoint,
         data=diagram_source.encode("utf-8"),
