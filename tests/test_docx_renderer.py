@@ -1,11 +1,63 @@
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
-from experiments.docx_renderer.render_with_kroki import DiagramRenderError, ensure_png_bytes, rewrite_markdown
+from experiments.docx_renderer.render_with_kroki import (
+    DiagramRenderError,
+    build_render_endpoint,
+    ensure_png_bytes,
+    get_render_scale,
+    rewrite_markdown,
+)
 
 
 class RewriteMarkdownTests(unittest.TestCase):
+    def test_get_render_scale_prefers_generic_env(self):
+        with mock.patch.dict(
+            "os.environ",
+            {
+                "DOCX_BUILDER_DIAGRAM_RENDER_SCALE": "3",
+                "KROKI_RENDER_SCALE": "2",
+            },
+            clear=False,
+        ):
+            self.assertEqual(get_render_scale(), 3.0)
+
+    def test_get_render_scale_clamps_and_falls_back(self):
+        with mock.patch.dict(
+            "os.environ",
+            {"DOCX_BUILDER_DIAGRAM_RENDER_SCALE": "bad"},
+            clear=False,
+        ):
+            self.assertEqual(get_render_scale(), 2.0)
+
+        with mock.patch.dict(
+            "os.environ",
+            {"DOCX_BUILDER_DIAGRAM_RENDER_SCALE": "0.5"},
+            clear=False,
+        ):
+            self.assertEqual(get_render_scale(), 1.0)
+
+        with mock.patch.dict(
+            "os.environ",
+            {"DOCX_BUILDER_DIAGRAM_RENDER_SCALE": "5"},
+            clear=False,
+        ):
+            self.assertEqual(get_render_scale(), 4.0)
+
+    def test_build_render_endpoint_includes_scale(self):
+        endpoint = build_render_endpoint(
+            "http://127.0.0.1:8000",
+            "packetdiag",
+            "png",
+            scale=2.5,
+        )
+        self.assertEqual(
+            endpoint,
+            "http://127.0.0.1:8000/packetdiag/png?scale=2.5",
+        )
+
     def test_ensure_png_bytes_rejects_non_png_payload(self):
         with self.assertRaises(DiagramRenderError) as ctx:
             ensure_png_bytes(

@@ -204,6 +204,17 @@ diagram source is treated as a test failure in the workspace.
 the selected input Markdown before it rewrites diagram fences or builds the
 final DOCX.
 
+If dense diagrams still look soft in the generated DOCX, raise the shared
+diagram render scale before running lint or render commands:
+
+```bash
+export DOCX_BUILDER_DIAGRAM_RENDER_SCALE=3
+```
+
+The default is `2`. This scale is applied to all Kroki-backed diagram types,
+not only Mermaid, so PlantUML, Graphviz, D2, Packetdiag, and similar diagram
+blocks are rendered at a higher pixel density before `docx-build` embeds them.
+
 For multi-document workflows, the repository now includes a manifest runner.
 The default manifest path is `examples/docx/render-manifest.example.yaml`.
 
@@ -287,7 +298,9 @@ The experiment works like this:
 
 `scripts/docx-renderer.env.example` also exposes optional `ORG_YAML` and
 `LOGO_PATH` variables so the render job can feed organization metadata and
-cover branding through to `docx-build`.
+cover branding through to `docx-build`. It also exposes
+`DOCX_BUILDER_DIAGRAM_RENDER_SCALE` for increasing diagram sharpness across all
+Kroki-supported diagram types.
 
 Typical usage:
 

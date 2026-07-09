@@ -38,6 +38,15 @@ Current limitations:
 - Generated diagram assets are tied to a single document render run rather than
   being organized as reusable build outputs for a docs set.
 
+Current quality control:
+
+- `DOCX_BUILDER_DIAGRAM_RENDER_SCALE` defaults to `2` for local and job-based
+  Kroki renders.
+- The same scale applies to every Kroki-backed diagram type validated by
+  `make diagram-lint` and rewritten during DOCX rendering.
+- Raise it to `3` for especially dense diagrams when sharper PNG output is
+  more important than render time or asset size.
+
 ## Recommended Direction
 
 For documentation-heavy repositories, move from ad hoc single-file rendering to
