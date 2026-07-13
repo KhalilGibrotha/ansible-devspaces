@@ -19,6 +19,10 @@ specifications.
 - **Bootstrap automation** (`scripts/clone-repos.sh` + `repos-to-clone.txt`)
   that materializes upstream Ansible dependencies inside `workspace-repos/` on every
   launch.
+- **Public architecture documentation starter**
+  (`workspace-repos/architecture-docs-starter`) so authors have a reusable
+  content-repo seed with baseline templates, manifests, and lint/editor
+  settings alongside the tooling repo.
 - **Bootstrap wrapper** (`scripts/devspace-bootstrap.sh`) that runs clone and
   Galaxy dependency install as one explicit post-start action.
 - **Project configuration** (`ansible.cfg`, `group_vars/`, `inventories/`)
@@ -67,6 +71,8 @@ specifications.
    `bash ./scripts/devspace-bootstrap.sh` from the terminal to fetch upstream
    content and dependencies. Cloned repos will appear in the visible
    `workspace-repos/` folder.
+   The default clone list includes both `dac-toolkit` and the public
+   `architecture-docs-starter` repo for documentation-focused work.
 4. **Run the smoke test**: execute the `Run sample site playbook` command or
    run `ansible-playbook playbooks/site.yml` manually. The playbook installs
    developer tooling, surfaces the injected domain credentials, and writes
