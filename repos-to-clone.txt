@@ -3,7 +3,7 @@
 https://github.com/ansible/ansible-dev-tools/tree/main/devspaces ansible-dev-tools-devspaces
 https://github.com/ansible/ansible-dev-tools ansible-dev-tools
 # Local DOCX rendering dependency
-https://github.com/KhalilGibrotha/dac-toolkit dac-toolkit codex/docx-diagram-sizing
+https://github.com/KhalilGibrotha/dac-toolkit dac-toolkit develop
 # Public architecture documentation starter
 https://github.com/KhalilGibrotha/architecture-docs-starter architecture-docs-starter main
 # Example application repositories to exercise against
