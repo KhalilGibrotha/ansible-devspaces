@@ -3,7 +3,7 @@ metadata:
   name: arc-ansible-devspace
   description: Development environment for Ansible playbooks and roles.
 attributes:
-  controller.devfile.io/storage-type: ephemeral
+  controller.devfile.io/storage-type: per-user
 components:
   - name: ansible-tools
     container:

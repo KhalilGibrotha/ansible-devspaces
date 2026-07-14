@@ -73,6 +73,9 @@ specifications.
    sibling `/projects/workspace-repos/` folder.
    The default clone list includes both `dac-toolkit` and the public
    `architecture-docs-starter` repo for documentation-focused work.
+   This Devfile now requests `controller.devfile.io/storage-type: per-user`
+   instead of `ephemeral` so `/projects` content is not treated as fully
+   disposable workspace state when the platform supports that behavior.
 4. **Run the smoke test**: execute the `Run sample site playbook` command or
    run `ansible-playbook playbooks/site.yml` manually. The playbook installs
    developer tooling, surfaces the injected domain credentials, and writes
@@ -101,6 +104,39 @@ After the workspace opens, run bootstrap manually:
 
 ```bash
 bash ./scripts/devspace-bootstrap.sh
+```
+
+For a fresh or timed-out workspace where you want the documentation toolchain
+back quickly, the practical recovery sequence is:
+
+```bash
+cd /projects/ansible-devspaces
+git pull
+bash ./scripts/devspace-bootstrap.sh
+export DOCX_BUILDER_DIAGRAM_RENDER_SCALE=3
+
+cd /projects/workspace-repos/dac.arc.seo.secu
+python3 scripts/lint-frontmatter.py --path .
+python3 ../dac-toolkit/scripts/docx_manifest.py validate --content-root . --manifest manifests/render-manifest.yaml
+python3 ../dac-toolkit/scripts/docx_manifest.py render --content-root . --manifest manifests/render-manifest.yaml --kroki-url http://127.0.0.1:8000
+```
+
+If the content repo already wraps the manifest runner in its own `Makefile`,
+the shorter path is:
+
+```bash
+cd /projects/workspace-repos/dac.arc.seo.secu
+make docx-validate
+make docx-render-all
+```
+
+If rendering fails immediately with a missing `docx-build` entrypoint after a
+workspace path change, remove the repo-local render virtual environment and let
+the wrapper rebuild it:
+
+```bash
+rm -rf .venv-docx-render
+make docx-render-all
 ```
 
 If you prefer to launch the workspace locally, run the same bootstrap steps
@@ -284,6 +320,20 @@ A manifest-oriented next-step design is documented in
 `docs/docx-workflow.md`. The current default manifest is
 `docs/render-manifest.yaml`, and a sample reference manifest remains at
 `examples/docx/render-manifest.example.yaml`.
+
+For real content repositories, a more explicit manifest entry style is often
+easier to troubleshoot than the compact sample:
+
+```yaml
+documents:
+  - id: reference_documentation_viewpoint_framework
+    input: references/reference_documentation_viewpoint-framework.md
+    output: exports/reference_documentation_viewpoint-framework.docx
+    rewritten_markdown: source/references/reference_documentation_viewpoint-framework.md
+    assets_dir: build/diagrams/reference_documentation_viewpoint_framework
+    org: vars/org.yaml
+    logo: assets/logo/secu_logo.png
+```
 
 ## Experimental Mermaid-to-DOCX Rendering
 
