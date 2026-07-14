@@ -22,11 +22,11 @@
     },
     {
       "name": "workspace-repos",
-      "path": "workspace-repos"
+      "path": "../workspace-repos"
     },
     {
       "name": "dac-toolkit",
-      "path": "workspace-repos/dac-toolkit"
+      "path": "../workspace-repos/dac-toolkit"
     }
   ],
   "extensions": {

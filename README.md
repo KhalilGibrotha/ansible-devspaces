@@ -17,10 +17,10 @@ specifications.
   (`devfile.yaml`) describing the workspace container, commands, and startup
   hooks.
 - **Bootstrap automation** (`scripts/clone-repos.sh` + `repos-to-clone.txt`)
-  that materializes upstream Ansible dependencies inside `workspace-repos/` on every
-  launch.
+  that materializes upstream Ansible dependencies into the sibling
+  `/projects/workspace-repos/` folder on every launch.
 - **Public architecture documentation starter**
-  (`workspace-repos/architecture-docs-starter`) so authors have a reusable
+  (`/projects/workspace-repos/architecture-docs-starter`) so authors have a reusable
   content-repo seed with baseline templates, manifests, and lint/editor
   settings alongside the tooling repo.
 - **Bootstrap wrapper** (`scripts/devspace-bootstrap.sh`) that runs clone and
@@ -70,7 +70,7 @@ specifications.
    `Bootstrap workspace dependencies` command from the Dev Spaces UI, or run
    `bash ./scripts/devspace-bootstrap.sh` from the terminal to fetch upstream
    content and dependencies. Cloned repos will appear in the visible
-   `workspace-repos/` folder.
+   sibling `/projects/workspace-repos/` folder.
    The default clone list includes both `dac-toolkit` and the public
    `architecture-docs-starter` repo for documentation-focused work.
 4. **Run the smoke test**: execute the `Run sample site playbook` command or
@@ -255,8 +255,8 @@ The primary Mermaid render path is now workspace-local rather than Kubernetes
 Job-based. After running bootstrap, the local wrapper will:
 
 1. create or reuse a Python virtual environment
-2. clone `dac-toolkit` into `workspace-repos/` automatically if it is missing
-3. install `docx-builder` from `workspace-repos/dac-toolkit/docx_builder`
+2. clone `dac-toolkit` into `/projects/workspace-repos/` automatically if it is missing
+3. install `docx-builder` from `/projects/workspace-repos/dac-toolkit/docx_builder`
 4. rewrite Mermaid fences to PNG assets through the Kroki sidecar
 5. run `docx-build` to generate the DOCX
 

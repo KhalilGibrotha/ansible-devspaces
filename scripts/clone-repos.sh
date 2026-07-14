@@ -6,7 +6,7 @@ SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 cd "$SCRIPT_DIR/.."
 
 REPO_LIST="repos-to-clone.txt"
-CLONE_ROOT="${CLONE_ROOT:-workspace-repos}"
+CLONE_ROOT="${CLONE_ROOT:-../workspace-repos}"
 
 if [[ ! -f $REPO_LIST ]]; then
     echo "Repository list $REPO_LIST not found." >&2

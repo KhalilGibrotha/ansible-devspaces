@@ -18,7 +18,7 @@ Current capabilities:
 - `make diagram-lint-all` reads the default manifest and validates every
   manifest-managed document.
 - `make docx-render-local`:
-  - ensures `dac-toolkit` is cloned into `workspace-repos/`
+  - ensures `dac-toolkit` is cloned into `/projects/workspace-repos/`
   - installs `docx_builder` into a local virtual environment
   - validates diagram fences in the selected input Markdown
   - rewrites diagram fences into generated PNG assets

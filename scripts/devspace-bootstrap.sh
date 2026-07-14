@@ -5,7 +5,7 @@ set -euo pipefail
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 cd "$SCRIPT_DIR/.."
 
-echo "[bootstrap] Cloning upstream repositories into workspace-repos/"
+echo "[bootstrap] Cloning upstream repositories into ../workspace-repos/"
 bash ./scripts/clone-repos.sh
 
 echo "[bootstrap] Installing Ansible Galaxy roles and collections"
